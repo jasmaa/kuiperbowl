@@ -1,0 +1,33 @@
+
+# Plan
+  - Update game client-side
+    - server calculates question progress and sends player proper state when player joins
+    - client side will ping server for state, updates accordingly
+    -  player will send answer and current time when buzzing, server will evaluate and change player/room state
+	  - if wrong: server locks out  player
+	  - if right: server awards points and becomes idle
+	-  player can request next question
+	  - if cond met (state is idle or overtime): go to next question
+	
+
+# Models
+
+  - Room: room for  players to join
+	- name
+	- state: IDLE, PLAYING, CONTEST, etc?
+	- players
+	- locked_out_players
+	
+	- current_question
+	- start_time
+	- end_time
+	
+  - Player: a player
+    - name
+	- score
+
+  - Question: a stored question in db
+    - category
+    - points
+	- content
+	- answer
