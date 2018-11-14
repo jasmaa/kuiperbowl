@@ -9,9 +9,9 @@ var score_dict;
 window.setInterval(ping, 5000);
 
 // Handle server response
-gamesock.onmessage = function(resp){
-  var data = JSON.parse(message.data);
+gamesock.onmessage = function(message){
 
+  var data = JSON.parse(message.data);
   console.log(data);
 
   game_state = data.game_state;
