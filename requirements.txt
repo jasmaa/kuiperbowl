@@ -1,5 +1,11 @@
-django
-django-channels
-asgi_redis
-daphne
-django_compressor
+certifi==2018.10.15
+chardet==3.0.4
+Django==2.1.3
+django-channels==0.7.0
+idna==2.7
+oauthlib==2.1.0
+pytz==2018.7
+requests==2.20.1
+requests-oauthlib==1.0.0
+six==1.11.0
+urllib3==1.24.1
