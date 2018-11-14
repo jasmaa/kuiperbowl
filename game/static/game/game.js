@@ -14,10 +14,24 @@ gamesock.onmessage = function(message){
   var data = JSON.parse(message.data);
   console.log(data);
 
-  game_state = data.game_state;
-  current_time = data.current_time;
-  question = data.current_question_content;
-  score_dict = data.score_dict;
+  if(data.response_type == "update"){
+    // sync client with server
+    game_state = data.game_state;
+    current_time = data.current_time;
+    question = data.current_question_content;
+    scores = data.scores;
+
+    // update scoreboard
+    var scoreboard = $('#scoreboard-body');
+    scoreboard.html("")
+    for(i=0; i<scores.length; i++){
+      scoreboard.append("<tr><td>"+scores[i][0]+"</td><td>"+scores[i][1]+"</td></tr>")
+    }
+
+  }
+  else if(data.response_type == "new_user"){
+    // assign id
+  }
 }
 
 // Ping server for state
@@ -29,7 +43,6 @@ function ping(){
     content:""
   }
 
-  console.log("ping");
   gamesock.send(JSON.stringify(message));
 }
 

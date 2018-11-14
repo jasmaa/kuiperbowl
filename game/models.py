@@ -3,13 +3,6 @@ from django.utils import timezone
 
 # Create your models here.
 
-class Player(models.Model):
-    """Quizbowl player"""
-
-    player_id = models.PositiveIntegerField()
-    name = models.CharField(max_length=20)
-    score = models.IntegerField()
-
 class Question(models.Model):
     """Quizbowl current_question"""
     category = models.TextField()
@@ -32,11 +25,29 @@ class Room(models.Model):
 
     label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
-    players = models.ManyToManyField(Player, related_name='players', blank=True)
-    locked_out_players = models.ManyToManyField(Player, related_name='locked_out_players', blank=True)
     current_question = models.OneToOneField(Question, on_delete=models.CASCADE, null=True)
     start_time = models.DateTimeField(default=timezone.now, db_index=True)
     end_time = models.DateTimeField(default=timezone.now, db_index=True)
+
+    def get_scores(self):
+        scores = []
+        for player in self.players.all():
+            scores.append((player.name, player.score))
+        scores.sort(key=lambda tup: tup[1])
+        scores.reverse()
+        return scores
+
+class Player(models.Model):
+    """Quizbowl player for a room"""
+
+    player_id = models.PositiveIntegerField()
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='players')
+    name = models.CharField(max_length=20)
+    score = models.IntegerField()
+    locked_out = models.BooleanField()
+
+    def __str__(self):
+        return self.name + ":" + str(self.player_id)
 
 class Message(models.Model):
     """Message that can be sent by Players"""

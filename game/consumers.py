@@ -33,14 +33,15 @@ def ws_receive(message):
             "start_time":room.start_time.timestamp(),
             "end_time":room.end_time.timestamp(),
             "current_question_content": room.current_question.content if room.current_question != None else "",
-            "score_dict":{},
+            "scores":room.get_scores(),
         })})
     elif(data['request_type'] == 'new_user'):
 
-        player_id = room.players.count()
-        p = Player(player_id=player_id, name=data['name'], score=0)
+        m = hashlib.md5()
+        m.update((label + str(room.players.count())).encode("utf8"))
+        player_id = int(m.hexdigest(), 16) % 9223372036854775807
+        p = Player(player_id=player_id, name=data['name'], score=0, locked_out=False, room=room)
         p.save()
-        room.players.add(p)
 
         message.reply_channel.send({'text':json.dumps({
             "response_type":"new_user",
