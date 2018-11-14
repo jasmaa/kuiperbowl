@@ -11,18 +11,30 @@
 
 # Websocket
 
+## request to server
 message = {
 	name:
 	current_time:
-	request:
+	request_type:
 	content:
+}
+
+## response from server
+message = {
+	game_state:
+	current_time:
+	start_time:
+	end_time:
+	current_question_content:{}
+	score_dict:{}
 }
 	  
 
 # Models
 
   - Room: room for  players to join
-	- name
+  
+    - label (room name as url)
 	- state: IDLE, PLAYING, CONTEST, etc?
 	- players
 	- locked_out_players
@@ -42,4 +54,6 @@ message = {
 	- answer
 	
   - Message: message sent by player to room
-    - 
+    - room
+	- player
+	

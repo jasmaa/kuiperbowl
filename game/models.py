@@ -29,7 +29,7 @@ class Room(models.Model):
         (CONTEST, 'contest'),
     )
 
-    name = models.CharField(max_length=20)
+    label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
     players = models.ManyToManyField(Player, related_name='players', blank=True)
     locked_out_players = models.ManyToManyField(Player, related_name='locked_out_players', blank=True)
