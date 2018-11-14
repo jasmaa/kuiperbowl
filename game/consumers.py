@@ -1,9 +1,17 @@
 from django.utils import timezone
-from channels import Group
-from channels.sessions import channel_session
+from django.http import HttpResponse
+from channels.handler import AsgiHandler
 from .models import *
 import json
 
+def http_consumer(message):
+    # Make standard HTTP response - access ASGI path attribute directly
+    response = HttpResponse("Hello world! You asked for %s" % message.content['path'])
+    # Encode that response into message format (ASGI)
+    for chunk in AsgiHandler.encode_response(response):
+        message.reply_channel.send(chunk)
+
+"""
 @channel_session
 def ws_connect(message):
     # add user if new to room players
@@ -32,10 +40,11 @@ def ws_receive(message):
             "current_question_content":room.current_question.content,
             "score_dict":{},
         }})
-    else if(data['request_type'] == 'buzz'):
+    elif(data['request_type'] == 'buzz'):
         pass
 
 @channel_session
 def ws_disconnect(message):
     label = message.channel_session['room']
     Group('chat-'+label).discard(message.reply_channel)
+"""

@@ -70,14 +70,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'quizbowl.wsgi.application'
+ASGI_APPLICATION = 'quizbowl.routing.application'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
-        },
-        "ROUTING": "chat.routing.channel_routing",
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "quizbowl.routing.channel_routing",
     },
 }
 
