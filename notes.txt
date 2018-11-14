@@ -8,7 +8,16 @@
 	  - if right: server awards points and becomes idle
 	-  player can request next question
 	  - if cond met (state is idle or overtime): go to next question
-	
+
+# Websocket
+
+message = {
+	name:
+	current_time:
+	request:
+	content:
+}
+	  
 
 # Models
 
@@ -31,3 +40,6 @@
     - points
 	- content
 	- answer
+	
+  - Message: message sent by player to room
+    - 

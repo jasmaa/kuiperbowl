@@ -1,0 +1,56 @@
+{% extends "game/base.html" %}
+
+{% block content %}
+
+{{ sanity }}
+<br>
+
+<div class="container">
+
+  <input type="text" id="request-content">
+  <div id="buz-btn" class="btn btn-danger">Buzz</div>
+
+  <div class="row">
+    <div class="col-8">
+      <div class="card bg-faded">
+        <div class="card-header">
+            <h3>Category: </h3>
+        </div>
+        <div class="card-body">
+          <span id="question-space">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lacinia mi at dictum dapibus. Vestibulum ultrices semper nibh lacinia ultricies. Sed ut ante nibh. Nulla laoreet nisi ultrices, semper lacus a, fringilla diam. Proin gravida dui viverra dui laoreet, id efficitur arcu finibus. Pellentesque orci lorem, aliquet non felis sed, lacinia volutpat nisi. Sed laoreet ipsum ut dolor tempor feugiat. Vivamus laoreet nibh vel nibh convallis efficitur. Cras sit amet sem augue. Aliquam  ornare, ante vitae vulputate vulputate, tellus leo placerat mauris, eget elementum purus nulla faucibus velit. Aliquam erat volutpat. Aliquam sit amet mauris ac risus venenatis accumsan. Nullam quis urna eget tortor luctus porta id ac mauris. Nam nec enim tristique, tempus lacus quis, iaculis odio.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="card">
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- loop here -->
+            <tr>
+              <td>Jameson</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>Yaldobeth</td>
+              <td>0</td>
+            </tr>
+        </tbody>
+      </table>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
