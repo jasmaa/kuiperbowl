@@ -13,14 +13,21 @@
 
 ## request to server
 message = {
-	name:
+	player_id:
 	current_time:
 	request_type:
 	content:
 }
 
+Request types
+  - ping
+  - new_user
+  - buzz
+  - next
+
 ## response from server
 message = {
+	response_type:
 	game_state:
 	current_time:
 	start_time:
@@ -28,7 +35,12 @@ message = {
 	current_question_content:{}
 	score_dict:{}
 }
-	  
+
+## add to server
+message = {
+	response_type:
+	player_id:
+}
 
 # Models
 

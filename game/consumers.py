@@ -4,6 +4,7 @@ from channels.sessions import channel_session
 from .models import *
 import json
 import datetime
+import hashlib
 
 @channel_session
 def ws_connect(message):
@@ -26,12 +27,24 @@ def ws_receive(message):
     # determine request type
     if(data['request_type'] == 'ping'):
         message.reply_channel.send({'text':json.dumps({
+            "response_type":"update",
             "game_state":room.state,
             "current_time":datetime.datetime.now().timestamp(),
             "start_time":room.start_time.timestamp(),
             "end_time":room.end_time.timestamp(),
             "current_question_content": room.current_question.content if room.current_question != None else "",
             "score_dict":{},
+        })})
+    elif(data['request_type'] == 'new_user'):
+
+        player_id = room.players.count()
+        p = Player(player_id=player_id, name=data['name'], score=0)
+        p.save()
+        room.players.add(p)
+
+        message.reply_channel.send({'text':json.dumps({
+            "response_type":"new_user",
+            "player_id":player_id,
         })})
     elif(data['request_type'] == 'buzz'):
         Group('chat-'+label).send({'text':json.dumps(m.as_dict())})

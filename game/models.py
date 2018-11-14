@@ -6,6 +6,7 @@ from django.utils import timezone
 class Player(models.Model):
     """Quizbowl player"""
 
+    player_id = models.PositiveIntegerField()
     name = models.CharField(max_length=20)
     score = models.IntegerField()
 

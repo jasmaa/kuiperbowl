@@ -33,6 +33,18 @@ function ping(){
   gamesock.send(JSON.stringify(message));
 }
 
+// new user
+function new_user(){
+  var message = {
+    name: $('#name').val(),
+    current_time: Date.now(),
+    request_type:"new_user",
+    content:""
+  }
+
+  gamesock.send(JSON.stringify(message));
+}
+
 // Buzz
 function buzz(){
 
