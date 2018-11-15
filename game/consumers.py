@@ -54,15 +54,15 @@ def ws_receive(message):
 
     elif(data['request_type'] == 'next'):
         update_time_state(room)
-        
+
         # next question
         if room.state == 'idle':
             questions = Question.objects.all()
             q = random.choice(questions)
 
-            room.state = 'playing';
+            room.state = 'playing'
             room.start_time = datetime.datetime.now().timestamp()
-            room.end_time = room.start_time + q.duration;
+            room.end_time = room.start_time + q.duration
             room.current_question = q
             room.save()
 

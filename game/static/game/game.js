@@ -20,8 +20,6 @@ function update(){
     return;
   }
 
-  console.log(game_state);
-
   var time_passed = current_time - start_time;
   var duration = end_time - start_time;
 

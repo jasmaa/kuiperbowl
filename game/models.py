@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+import datetime
 
 # Create your models here.
 
@@ -26,9 +27,9 @@ class Room(models.Model):
 
     label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
-    current_question = models.OneToOneField(Question, on_delete=models.CASCADE, null=True)
-    start_time = models.FloatField()
-    end_time = models.FloatField()
+    current_question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='rooms', null=True)
+    start_time = models.FloatField(default=datetime.datetime.now().timestamp())
+    end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
 
     def get_scores(self):
         scores = []
