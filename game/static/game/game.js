@@ -4,27 +4,38 @@ var gamesock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.hos
 var player_name;
 var player_id;
 
-var game_state;
+var game_state = 'idle';
 var current_time;
 var start_time;
 var end_time;
+var grace_time = 3;
 var question;
+var category;
 var curr_question_content;
 var score_dict;
 
+// Update game locally
 function update(){
   if(question == undefined){
     return;
   }
 
+  console.log(game_state);
+
   var time_passed = current_time - start_time;
-  var time_end = end_time - start_time;
+  var duration = end_time - start_time;
 
-  curr_question_content = question.substring(0, parseInt(question.length * (time_passed / time_end)))
-  current_time += 0.1;
+  // Update if game is going
+  if(time_passed < duration && game_state == 'playing'){
+    curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
+    current_time += 0.1;
 
-  var question_body = $('#question-space');
-  question_body.html(curr_question_content);
+    var question_body = $('#question-space');
+    question_body.html(curr_question_content);
+  }
+  else if(time_passed >= duration){
+    game_state = 'idle';
+  }
 }
 
 // Handle server response
@@ -39,21 +50,27 @@ gamesock.onmessage = function(message){
     start_time = data.start_time;
     end_time = data.end_time;
     question = data.current_question_content;
+    category = data.category;
     scores = data.scores;
 
-    // update scoreboard
+    // update ui
     var scoreboard = $('#scoreboard-body');
     scoreboard.html("")
     for(i=0; i<scores.length; i++){
       scoreboard.append("<tr><td>"+scores[i][0]+"</td><td>"+scores[i][1]+"</td></tr>")
     }
 
+    $('#category-header').html("Category: " + category);
   }
   else if(data.response_type == "new_user"){
     setCookie('player_id', data.player_id);
     setCookie('player_name', data.player_name);
     player_id = data.player_id;
     player_name = data.player_name;
+
+    // Update name
+    $('#name').val(player_name);
+    ping()
   }
 }
 
@@ -85,7 +102,7 @@ function new_user(){
     player_id: player_id,
     current_time: Date.now(),
     request_type:"new_user",
-    content:$('#name').val()
+    content:""
   }
   gamesock.send(JSON.stringify(message));
 }
@@ -109,14 +126,16 @@ function buzz(){
 
 // Request next question
 function next(){
-  var question_body = $('#question-space');
-  question_body.html("");
+  if(game_state == 'idle'){
+    var question_body = $('#question-space');
+    question_body.html("");
 
-  var message = {
-    player_id: player_id,
-    current_time: Date.now(),
-    request_type:"next",
-    content:""
+    var message = {
+      player_id: player_id,
+      current_time: Date.now(),
+      request_type:"next",
+      content:""
+    }
+    gamesock.send(JSON.stringify(message));
   }
-  gamesock.send(JSON.stringify(message));
 }

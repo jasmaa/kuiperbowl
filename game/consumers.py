@@ -10,8 +10,6 @@ import random
 
 @channel_session
 def ws_connect(message):
-    # add user if new to room players
-
     # get room
     prefix, label = message['path'].strip('/').split('/')
     room = Room.objects.get(label=label)
@@ -29,15 +27,8 @@ def ws_receive(message):
     # determine request type
     if(data['request_type'] == 'ping'):
         # update ping
-        message.reply_channel.send({'text':json.dumps({
-            "response_type":"update",
-            "game_state":room.state,
-            "current_time":datetime.datetime.now().timestamp(),
-            "start_time":room.start_time,
-            "end_time":room.end_time,
-            "current_question_content": room.current_question.content if room.current_question != None else "",
-            "scores":room.get_scores(),
-        })})
+        update_time_state(room)
+        message.reply_channel.send(get_response_json(room))
 
     elif(data['request_type'] == 'new_user'):
         # new user
@@ -59,41 +50,50 @@ def ws_receive(message):
         p.name = data['content']
         p.save()
 
-        Group('game-'+label).send({'text':json.dumps({
-            "response_type":"update",
-            "game_state":room.state,
-            "current_time":datetime.datetime.now().timestamp(),
-            "start_time":room.start_time,
-            "end_time":room.end_time,
-            "current_question_content": room.current_question.content if room.current_question != None else "",
-            "scores":room.get_scores(),
-        })})
+        Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'next'):
+        update_time_state(room)
+        
         # next question
-        questions = Question.objects.all()
-        q = random.choice(questions)
+        if room.state == 'idle':
+            questions = Question.objects.all()
+            q = random.choice(questions)
 
-        room.start_time = datetime.datetime.now().timestamp()
-        room.end_time = room.start_time + q.duration;
-        room.current_question = q
-        room.save()
+            room.state = 'playing';
+            room.start_time = datetime.datetime.now().timestamp()
+            room.end_time = room.start_time + q.duration;
+            room.current_question = q
+            room.save()
 
-        Group('game-'+label).send({'text':json.dumps({
-            "response_type":"update",
-            "game_state":room.state,
-            "current_time":datetime.datetime.now().timestamp(),
-            "start_time":room.start_time,
-            "end_time":room.end_time,
-            "current_question_content": room.current_question.content if room.current_question != None else "",
-            "scores":room.get_scores(),
-        })})
+            Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'buzz'):
-        Group('game-'+label).send({'text':json.dumps(m.as_dict())})
         pass
 
 @channel_session
 def ws_disconnect(message):
     label = message.channel_session['room']
     Group('chat-'+label).discard(message.reply_channel)
+
+
+
+def update_time_state(room):
+    """Checks time and updates state"""
+    if(datetime.datetime.now().timestamp() >= room.end_time):
+        room.state = 'idle'
+        room.save()
+
+def get_response_json(room):
+    """Generates json for update response"""
+
+    return {'text':json.dumps({
+        "response_type":"update",
+        "game_state":room.state,
+        "current_time":datetime.datetime.now().timestamp(),
+        "start_time":room.start_time,
+        "end_time":room.end_time,
+        "current_question_content": room.current_question.content if room.current_question != None else "",
+        "category":room.current_question.category if room.current_question != None else "",
+        "scores":room.get_scores(),
+    })}
