@@ -1,7 +1,7 @@
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 var gamesock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.host + window.location.pathname);
 
-var name = "Jerry";
+var player_name;
 var player_id;
 
 var game_state;
@@ -12,8 +12,11 @@ var question;
 var curr_question_content;
 var score_dict;
 
-window.setInterval(update, 100);
 function update(){
+  if(question == undefined){
+    return;
+  }
+
   var time_passed = current_time - start_time;
   var time_end = end_time - start_time;
 
@@ -22,13 +25,10 @@ function update(){
 
   var question_body = $('#question-space');
   question_body.html(curr_question_content);
-
-  console.log(time_passed);
 }
 
 // Handle server response
 gamesock.onmessage = function(message){
-
   var data = JSON.parse(message.data);
   console.log(data);
 
@@ -51,9 +51,9 @@ gamesock.onmessage = function(message){
   }
   else if(data.response_type == "new_user"){
     setCookie('player_id', data.player_id);
-    setCookie('name', data.name);
+    setCookie('player_name', data.player_name);
     player_id = data.player_id;
-    name = data.name;
+    player_name = data.player_name;
   }
 }
 
@@ -64,6 +64,8 @@ function setup(){
     new_user();
   }
   ping();
+
+  $('#name').val(player_name);
 }
 
 // Ping server for state
@@ -90,6 +92,7 @@ function new_user(){
 
 // Request change name
 function set_name(){
+  setCookie('player_name', $('#name').val());
   var message = {
     player_id: player_id,
     current_time: Date.now(),

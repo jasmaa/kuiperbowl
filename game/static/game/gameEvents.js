@@ -1,8 +1,9 @@
 // Events in game
 
-// setup and ping
+// timed events
 window.setTimeout(setup, 600);
 window.setInterval(ping, 5000);
+window.setInterval(update, 100);
 
 // JQuery events
 $('#name').on('input', function() {
@@ -10,7 +11,9 @@ $('#name').on('input', function() {
 });
 
 $(document).keypress(function(e) {
-  if(e.which == 110){
-    next();
+  if(!$(e.target).is("input")){
+    if(e.which == 110){
+      next();
+    }
   }
 });

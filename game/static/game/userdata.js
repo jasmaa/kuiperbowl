@@ -2,7 +2,7 @@
 
 function retrieve_userdata(){
   var prefs = cookieToDict(document.cookie);
-  name = prefs['name'];
+  player_name = prefs['player_name'];
   player_id = prefs['player_id'];
 }
 

@@ -44,12 +44,13 @@ def ws_receive(message):
         m = hashlib.md5()
         m.update((label + str(room.players.count())).encode("utf8"))
         player_id = int(m.hexdigest(), 16) % 1000000
-        p = Player(player_id=player_id, name=data['content'], score=0, locked_out=False, room=room)
+        p = Player(player_id=player_id, name="Jerry", score=0, locked_out=False, room=room)
         p.save()
 
         message.reply_channel.send({'text':json.dumps({
             "response_type":"new_user",
-            "player_id":player_id,
+            "player_id":p.player_id,
+            "player_name":p.name,
         })})
 
     elif(data['request_type'] == 'set_name'):
