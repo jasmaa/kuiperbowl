@@ -11,5 +11,5 @@ def game_room(request, label):
     room, created = Room.objects.get_or_create(label=label)
 
     return render(request, "game/game.html",{
-        "sanity":room,
+        "room":room,
     })

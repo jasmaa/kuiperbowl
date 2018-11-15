@@ -40,7 +40,7 @@ class Room(models.Model):
 class Player(models.Model):
     """Quizbowl player for a room"""
 
-    player_id = models.PositiveIntegerField()
+    player_id = models.PositiveIntegerField(primary_key=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='players')
     name = models.CharField(max_length=20)
     score = models.IntegerField()

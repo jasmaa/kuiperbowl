@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from channels import Group
 from channels.sessions import channel_session
 from .models import *
@@ -39,16 +40,34 @@ def ws_receive(message):
 
         m = hashlib.md5()
         m.update((label + str(room.players.count())).encode("utf8"))
-        player_id = int(m.hexdigest(), 16) % 9223372036854775807
-        p = Player(player_id=player_id, name=data['name'], score=0, locked_out=False, room=room)
+        player_id = int(m.hexdigest(), 16) % 1000000
+        p = Player(player_id=player_id, name=data['content'], score=0, locked_out=False, room=room)
         p.save()
 
         message.reply_channel.send({'text':json.dumps({
             "response_type":"new_user",
             "player_id":player_id,
         })})
+
+    elif(data['request_type'] == 'set_name'):
+        # update name
+        p = Player.objects.get(player_id=int(data['player_id']))
+        p.name = data['content']
+        p.save()
+
+        # Group update
+        Group('game-'+label).send({'text':json.dumps({
+            "response_type":"update",
+            "game_state":room.state,
+            "current_time":datetime.datetime.now().timestamp(),
+            "start_time":room.start_time.timestamp(),
+            "end_time":room.end_time.timestamp(),
+            "current_question_content": room.current_question.content if room.current_question != None else "",
+            "scores":room.get_scores(),
+        })})
+
     elif(data['request_type'] == 'buzz'):
-        Group('chat-'+label).send({'text':json.dumps(m.as_dict())})
+        Group('game-'+label).send({'text':json.dumps(m.as_dict())})
         pass
 
 @channel_session

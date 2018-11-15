@@ -24,6 +24,7 @@ Request types
   - new_user
   - buzz
   - next
+  - set_name
 
 ## response from server
 message = {
