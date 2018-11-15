@@ -65,6 +65,7 @@ message = {
     - points
 	- content
 	- answer
+	- duration
 	
   - Message: message sent by player to room
     - room

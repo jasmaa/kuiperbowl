@@ -9,6 +9,7 @@ class Question(models.Model):
     points = models.IntegerField()
     content = models.TextField()
     answer = models.TextField()
+    duration = models.FloatField()
 
 class Room(models.Model):
     """Room to play quizbowl"""
@@ -26,8 +27,8 @@ class Room(models.Model):
     label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
     current_question = models.OneToOneField(Question, on_delete=models.CASCADE, null=True)
-    start_time = models.DateTimeField(default=timezone.now, db_index=True)
-    end_time = models.DateTimeField(default=timezone.now, db_index=True)
+    start_time = models.FloatField()
+    end_time = models.FloatField()
 
     def get_scores(self):
         scores = []

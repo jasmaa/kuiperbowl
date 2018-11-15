@@ -6,6 +6,7 @@ from .models import *
 import json
 import datetime
 import hashlib
+import random
 
 @channel_session
 def ws_connect(message):
@@ -27,17 +28,19 @@ def ws_receive(message):
 
     # determine request type
     if(data['request_type'] == 'ping'):
+        # update ping
         message.reply_channel.send({'text':json.dumps({
             "response_type":"update",
             "game_state":room.state,
             "current_time":datetime.datetime.now().timestamp(),
-            "start_time":room.start_time.timestamp(),
-            "end_time":room.end_time.timestamp(),
+            "start_time":room.start_time,
+            "end_time":room.end_time,
             "current_question_content": room.current_question.content if room.current_question != None else "",
             "scores":room.get_scores(),
         })})
-    elif(data['request_type'] == 'new_user'):
 
+    elif(data['request_type'] == 'new_user'):
+        # new user
         m = hashlib.md5()
         m.update((label + str(room.players.count())).encode("utf8"))
         player_id = int(m.hexdigest(), 16) % 1000000
@@ -55,13 +58,32 @@ def ws_receive(message):
         p.name = data['content']
         p.save()
 
-        # Group update
         Group('game-'+label).send({'text':json.dumps({
             "response_type":"update",
             "game_state":room.state,
             "current_time":datetime.datetime.now().timestamp(),
-            "start_time":room.start_time.timestamp(),
-            "end_time":room.end_time.timestamp(),
+            "start_time":room.start_time,
+            "end_time":room.end_time,
+            "current_question_content": room.current_question.content if room.current_question != None else "",
+            "scores":room.get_scores(),
+        })})
+
+    elif(data['request_type'] == 'next'):
+        # next question
+        questions = Question.objects.all()
+        q = random.choice(questions)
+
+        room.start_time = datetime.datetime.now().timestamp()
+        room.end_time = room.start_time + q.duration;
+        room.current_question = q
+        room.save()
+
+        Group('game-'+label).send({'text':json.dumps({
+            "response_type":"update",
+            "game_state":room.state,
+            "current_time":datetime.datetime.now().timestamp(),
+            "start_time":room.start_time,
+            "end_time":room.end_time,
             "current_question_content": room.current_question.content if room.current_question != None else "",
             "scores":room.get_scores(),
         })})

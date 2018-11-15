@@ -6,15 +6,25 @@ var player_id;
 
 var game_state;
 var current_time;
+var start_time;
+var end_time;
 var question;
+var curr_question_content;
 var score_dict;
 
-window.setTimeout(setup, 600);
-window.setInterval(ping, 5000);
+window.setInterval(update, 100);
+function update(){
+  var time_passed = current_time - start_time;
+  var time_end = end_time - start_time;
 
-$('#name').on('input', function() {
-  set_name();
-});
+  curr_question_content = question.substring(0, parseInt(question.length * (time_passed / time_end)))
+  current_time += 0.1;
+
+  var question_body = $('#question-space');
+  question_body.html(curr_question_content);
+
+  console.log(time_passed);
+}
 
 // Handle server response
 gamesock.onmessage = function(message){
@@ -26,6 +36,8 @@ gamesock.onmessage = function(message){
     // sync client with server
     game_state = data.game_state;
     current_time = data.current_time;
+    start_time = data.start_time;
+    end_time = data.end_time;
     question = data.current_question_content;
     scores = data.scores;
 
@@ -65,7 +77,7 @@ function ping(){
   gamesock.send(JSON.stringify(message));
 }
 
-// new user
+// Request new user
 function new_user(){
   var message = {
     player_id: player_id,
@@ -76,7 +88,7 @@ function new_user(){
   gamesock.send(JSON.stringify(message));
 }
 
-// change name
+// Request change name
 function set_name(){
   var message = {
     player_id: player_id,
@@ -94,5 +106,14 @@ function buzz(){
 
 // Request next question
 function next(){
+  var question_body = $('#question-space');
+  question_body.html("");
 
+  var message = {
+    player_id: player_id,
+    current_time: Date.now(),
+    request_type:"next",
+    content:""
+  }
+  gamesock.send(JSON.stringify(message));
 }
