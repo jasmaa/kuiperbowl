@@ -5,14 +5,31 @@ var player_name;
 var player_id;
 
 var game_state = 'idle';
+
 var current_time;
 var start_time;
 var end_time;
+var buzz_start_time;
 var grace_time = 3;
+
 var question;
 var category;
 var curr_question_content;
 var score_dict;
+
+// Set up client
+function setup(){
+  // set up user
+  retrieve_userdata();
+  if(player_id == undefined){
+    new_user();
+  }
+  ping();
+  $('#name').val(player_name);
+
+  // set up current time
+  current_time = buzz_start_time;
+}
 
 // Update game locally
 function update(){
@@ -24,9 +41,16 @@ function update(){
   var duration = end_time - start_time;
 
   // Update if game is going
-  if(time_passed < duration && game_state == 'playing'){
-    curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
-    current_time += 0.1;
+  if(time_passed < duration){
+
+    if(game_state == 'playing'){
+      curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
+      current_time += 0.1;
+    }
+    else if(game_state == 'contest'){
+      time_passed = buzz_start_time - start_time;
+      curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
+    }
 
     var question_body = $('#question-space');
     question_body.html(curr_question_content);
@@ -47,6 +71,7 @@ gamesock.onmessage = function(message){
     current_time = data.current_time;
     start_time = data.start_time;
     end_time = data.end_time;
+    buzz_start_time = data.buzz_start_time;
     question = data.current_question_content;
     category = data.category;
     scores = data.scores;
@@ -70,17 +95,6 @@ gamesock.onmessage = function(message){
     $('#name').val(player_name);
     ping()
   }
-}
-
-// Set up
-function setup(){
-  retrieve_userdata();
-  if(player_id == undefined){
-    new_user();
-  }
-  ping();
-
-  $('#name').val(player_name);
 }
 
 // Ping server for state
@@ -119,7 +133,30 @@ function set_name(){
 
 // Buzz
 function buzz(){
+  if(game_state == 'playing'){
+    game_state = 'contest';
+    var message = {
+      player_id: player_id,
+      current_time: Date.now(),
+      request_type:"buzz_init",
+      content:""
+    }
+    gamesock.send(JSON.stringify(message));
+  }
+}
 
+// Answer
+function answer(){
+  if(game_state == 'contest'){
+    game_state = 'playing';
+    var message = {
+      player_id: player_id,
+      current_time: Date.now(),
+      request_type:"buzz_answer",
+      content:""
+    }
+    gamesock.send(JSON.stringify(message));
+  }
 }
 
 // Request next question

@@ -27,9 +27,17 @@ class Room(models.Model):
 
     label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
+
     current_question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='rooms', null=True)
     start_time = models.FloatField(default=datetime.datetime.now().timestamp())
     end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
+
+    buzz_player = models.OneToOneField('Player', on_delete=models.CASCADE, null=True, related_name='buzz_player')
+    buzz_start_time = models.FloatField(default=datetime.datetime.now().timestamp())
+    buzz_end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
+
+    def __str__(self):
+        return self.label
 
     def get_scores(self):
         scores = []

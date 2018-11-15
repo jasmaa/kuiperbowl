@@ -22,7 +22,8 @@ message = {
 Request types
   - ping
   - new_user
-  - buzz
+  - buzz_init
+  - buzz_answer
   - next
   - set_name
 
@@ -33,6 +34,7 @@ message = {
 	current_time:
 	start_time:
 	end_time:
+	buzz_start_time:
 	current_question_content:{}
 	category:
 	score_dict:{}
@@ -57,6 +59,10 @@ message = {
 	- start_time
 	- end_time
 	
+	- buzz_player
+	- buzz_start_time
+	- buzz_end_time
+	
   - Player: a player
     - name
 	- score
@@ -72,3 +78,9 @@ message = {
     - room
 	- player
 	
+# Buzz timing notes
+  - when a buzz ends, get the duration of buzz
+    - start = start + buzz_duration
+    - end = end + buzz_duration
+  - during buzz
+    - current_time = buzz_start_time

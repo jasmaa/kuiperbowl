@@ -53,9 +53,8 @@ def ws_receive(message):
         Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'next'):
-        update_time_state(room)
-
         # next question
+        update_time_state(room)
         if room.state == 'idle':
             questions = Question.objects.all()
             q = random.choice(questions)
@@ -68,15 +67,37 @@ def ws_receive(message):
 
             Group('game-'+label).send(get_response_json(room))
 
-    elif(data['request_type'] == 'buzz'):
-        pass
+    elif(data['request_type'] == 'buzz_init'):
+        # buzz init
+        if room.state == 'playing':
+            room.state = 'contest'
+            room.buzz_player = room.players.get(player_id=data['player_id'])
+            room.buzz_start_time = datetime.datetime.now().timestamp()
+            room.save()
+
+            Group('game-'+label).send(get_response_json(room))
+
+    elif(data['request_type'] == 'buzz_answer'):
+        # buzz answer
+        if room.state == 'contest':
+
+            # evaluate answer here!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+            room.state = 'playing'
+            room.start_time += buzz_duration
+            room.end_time += buzz_duration
+            room.save()
+
+            Group('game-'+label).send(get_response_json(room))
+
 
 @channel_session
 def ws_disconnect(message):
     label = message.channel_session['room']
     Group('chat-'+label).discard(message.reply_channel)
 
-
+# Helper methods
 
 def update_time_state(room):
     """Checks time and updates state"""
@@ -93,6 +114,7 @@ def get_response_json(room):
         "current_time":datetime.datetime.now().timestamp(),
         "start_time":room.start_time,
         "end_time":room.end_time,
+        "buzz_start_time":room.buzz_start_time,
         "current_question_content": room.current_question.content if room.current_question != None else "",
         "category":room.current_question.category if room.current_question != None else "",
         "scores":room.get_scores(),
