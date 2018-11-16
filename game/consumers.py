@@ -91,6 +91,12 @@ def ws_receive(message):
 
             Group('game-'+label).send(get_response_json(room))
 
+    elif(data['request_type'] == 'get_answer'):
+        if room.state == 'idle':
+            Group('game-'+label).send({'text':json.dumps({
+                "response_type":"send_answer",
+                "answer":room.current_question.answer,
+            })});
 
 @channel_session
 def ws_disconnect(message):

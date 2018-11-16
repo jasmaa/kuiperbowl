@@ -26,6 +26,7 @@ Request types
   - buzz_answer
   - next
   - set_name
+  - get_answer
 
 ## response from server
 message = {

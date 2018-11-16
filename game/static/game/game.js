@@ -58,6 +58,8 @@ function update(){
 
       var content_progress = $('#content-progress');
       content_progress.css('width', Math.round(100 * (1.1*time_passed / duration ))+'%');
+
+      $('#answer-header').html("");
     }
     else if(game_state == 'contest'){
       time_passed = buzz_start_time - start_time;
@@ -78,7 +80,9 @@ function update(){
   }
   else if(time_passed >= duration){
     game_state = 'idle';
-
+    if($('#answer-header').html() == ""){
+        get_answer();
+    }
     var content_progress = $('#content-progress');
     content_progress.css('width', '0%');
   }
@@ -117,7 +121,10 @@ gamesock.onmessage = function(message){
 
     // Update name
     $('#name').val(player_name);
-    ping()
+    ping();
+  }
+  else if(data.response_type == "send_answer"){
+    $('#answer-header').html("Answer: " + data.answer);
   }
 }
 
@@ -200,6 +207,15 @@ function next(){
       current_time: Date.now(),
       request_type:"next",
       content:""
+    }
+    gamesock.send(JSON.stringify(message));
+  }
+}
+
+function get_answer(){
+  if(game_state == 'idle'){
+    var message = {
+      request_type:"get_answer",
     }
     gamesock.send(JSON.stringify(message));
   }
