@@ -27,6 +27,7 @@ function setup(){
   }
   ping();
   $('#name').val(player_name);
+  $('#request-content').hide();
 
   // set up current time
   current_time = buzz_start_time;
@@ -44,23 +45,32 @@ function update(){
   // Update if game is going
   if(time_passed < duration){
 
+    var buzz_progress = $('#buzz-progress');
+    buzz_progress.css('width', Math.round(100 * (1.3*buzz_passed_time / grace_time ))+'%');
+
     if(game_state == 'playing'){
+      buzz_passed_time = 0;
       curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration-grace_time) )))
       current_time += 0.1;
 
+      $('#content-progress').show();
+      $('#buzz-progress').hide();
+
       var content_progress = $('#content-progress');
-      content_progress.attr('class', 'progress-bar bg-success');
-      content_progress.css('width', 5+Math.round(100 * (time_passed / duration ))+'%');
+      content_progress.css('width', Math.round(100 * (1.1*time_passed / duration ))+'%');
     }
     else if(game_state == 'contest'){
       time_passed = buzz_start_time - start_time;
       curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration-grace_time) )))
 
-      //var time_passed_buzz = current_time - buzz_start_time;
-      //var duration_buzz = grace_time;
-      var content_progress = $('#content-progress');
-      content_progress.attr('class', 'progress-bar bg-danger');
-      content_progress.css('width', 100+'%');
+      $('#content-progress').hide();
+      $('#buzz-progress').show();
+
+      // auto answer if over buzz time
+      if(buzz_passed_time >= grace_time){
+        answer();
+      }
+      buzz_passed_time += 0.1;
     }
 
     var question_body = $('#question-space');
@@ -148,6 +158,11 @@ function set_name(){
 // Buzz
 function buzz(){
   if(game_state == 'playing'){
+    $('#request-content').val('');
+    $('#request-content').show();
+    $('#request-content').focus();
+    buzz_passed_time = 0;
+
     game_state = 'contest';
     var message = {
       player_id: player_id,
@@ -162,6 +177,7 @@ function buzz(){
 // Answer
 function answer(){
   if(game_state == 'contest'){
+    $('#request-content').hide();
     game_state = 'playing';
     var message = {
       player_id: player_id,

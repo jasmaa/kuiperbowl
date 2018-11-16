@@ -18,8 +18,11 @@ $(document).keypress(function(e) {
     else if(e.which == 32){
       buzz();
     }
-    else if(e.which == 122){
-      answer();
-    }
+  }
+});
+
+$('#request-content').keypress(function(e) {
+  if(e.which == 13){
+    answer();
   }
 });
