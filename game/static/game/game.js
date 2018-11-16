@@ -10,6 +10,7 @@ var current_time;
 var start_time;
 var end_time;
 var buzz_start_time;
+var buzz_passed_time = 0;
 var grace_time = 3;
 
 var question;
@@ -44,12 +45,22 @@ function update(){
   if(time_passed < duration){
 
     if(game_state == 'playing'){
-      curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
+      curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration-grace_time) )))
       current_time += 0.1;
+
+      var content_progress = $('#content-progress');
+      content_progress.attr('class', 'progress-bar bg-success');
+      content_progress.css('width', 5+Math.round(100 * (time_passed / duration ))+'%');
     }
     else if(game_state == 'contest'){
       time_passed = buzz_start_time - start_time;
-      curr_question_content = question.substring(0, parseInt(question.length * (time_passed / (duration-grace_time) )))
+      curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration-grace_time) )))
+
+      //var time_passed_buzz = current_time - buzz_start_time;
+      //var duration_buzz = grace_time;
+      var content_progress = $('#content-progress');
+      content_progress.attr('class', 'progress-bar bg-danger');
+      content_progress.css('width', 100+'%');
     }
 
     var question_body = $('#question-space');
@@ -57,6 +68,9 @@ function update(){
   }
   else if(time_passed >= duration){
     game_state = 'idle';
+
+    var content_progress = $('#content-progress');
+    content_progress.css('width', '0%');
   }
 }
 

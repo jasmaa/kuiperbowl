@@ -11,7 +11,6 @@ $('#name').on('input', function() {
 });
 
 $(document).keypress(function(e) {
-  console.log(e.which)
   if(!$(e.target).is("input")){
     if(e.which == 110){
       next();
