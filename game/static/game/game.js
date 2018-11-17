@@ -48,8 +48,22 @@ function update() {
   buzz_progress.css('width', Math.round(100 * (1.1 * buzz_passed_time / buzz_time)) + '%');
   var content_progress = $('#content-progress');
   content_progress.css('width', Math.round(100 * (1.05 * time_passed / duration)) + '%');
+  var question_body = $('#question-space');
+  question_body.html(curr_question_content);
 
-  if (game_state == 'playing') {
+  if(game_state == 'idle'){
+    if ($('#answer-header').html() == "") {
+      get_answer();
+    }
+
+    var content_progress = $('#content-progress');
+    content_progress.css('width', '0%');
+
+    var question_space = $('#question-space');
+    question_space.html(question);
+  }
+
+  else if (game_state == 'playing') {
     buzz_passed_time = 0;
     curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration - grace_time))))
     current_time += 0.1;
@@ -73,20 +87,9 @@ function update() {
     buzz_passed_time += 0.1;
   }
 
-  var question_body = $('#question-space');
-  question_body.html(curr_question_content);
-
-  if (current_time >= end_time) {
+  // transition to idle if overtime while playing
+  if (game_state == 'playing' && current_time >= end_time) {
     game_state = 'idle';
-    if ($('#answer-header').html() == "") {
-      get_answer();
-    }
-
-    var content_progress = $('#content-progress');
-    content_progress.css('width', '0%');
-
-    var question_space = $('#question-space');
-    question_space.html(question);
   }
 }
 
