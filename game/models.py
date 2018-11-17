@@ -18,11 +18,21 @@ class Room(models.Model):
     IDLE = 'idle'
     PLAYING = 'playing'
     CONTEST = 'contest'
-
     game_states = (
         (IDLE, 'idle'),
         (PLAYING, 'playing'),
         (CONTEST, 'contest'),
+    )
+
+    EVERYTHING = 'Everything'
+    SCIENCE = 'Science'
+    HISTORY = 'History'
+    LITERATURE = 'Literature'
+    categories = (
+        (EVERYTHING, 'Everything'),
+        (SCIENCE, 'Science'),
+        (HISTORY, 'History'),
+        (LITERATURE, 'Literature'),
     )
 
     label = models.SlugField(unique=True)
@@ -35,6 +45,8 @@ class Room(models.Model):
     buzz_player = models.OneToOneField('Player', on_delete=models.CASCADE, null=True, related_name='buzz_player')
     buzz_start_time = models.FloatField(default=datetime.datetime.now().timestamp())
     buzz_end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
+
+    category = models.CharField(max_length=30, choices=categories, default=EVERYTHING)
 
     def __str__(self):
         return self.label

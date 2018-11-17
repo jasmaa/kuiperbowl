@@ -58,7 +58,7 @@ def ws_receive(message):
         # next question
         update_time_state(room)
         if room.state == 'idle':
-            questions = Question.objects.all()
+            questions = Question.objects.all() if room.category == 'Everything' else Question.objects.filter(category=room.category)
             q = random.choice(questions)
 
             room.state = 'playing'
@@ -121,6 +121,10 @@ def ws_receive(message):
                 "answer":room.current_question.answer,
             })});
 
+    elif(data['request_type'] == 'set_category'):
+        room.category = data['content']
+        room.save()
+
 @channel_session
 def ws_disconnect(message):
     label = message.channel_session['room']
@@ -147,5 +151,6 @@ def get_response_json(room):
         "buzz_start_time":room.buzz_start_time,
         "current_question_content": room.current_question.content if room.current_question != None else "",
         "category":room.current_question.category if room.current_question != None else "",
+        "room_category":room.category,
         "scores":room.get_scores(),
     })}

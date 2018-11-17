@@ -119,7 +119,9 @@ gamesock.onmessage = function(message) {
     }
 
     $('#category-header').html("Category: " + category);
-  } else if (data.response_type == "new_user") {
+    $('#category-select').val(data.room_category);
+  }
+  else if (data.response_type == "new_user") {
     setCookie('player_id', data.player_id);
     setCookie('player_name', data.player_name);
     player_id = data.player_id;
@@ -176,6 +178,9 @@ function buzz() {
     $('#request-content').focus();
     buzz_passed_time = 0;
 
+    $('#next-btn').hide();
+    $('#buzz-btn').hide();
+
     game_state = 'contest';
     var message = {
       player_id: player_id,
@@ -190,8 +195,12 @@ function buzz() {
 // Answer
 function answer() {
   if (game_state == 'contest') {
+
+    $('#next-btn').show();
+    $('#buzz-btn').show();
     $('#request-content').hide();
     game_state = 'playing';
+
     var message = {
       player_id: player_id,
       current_time: Date.now(),
@@ -226,4 +235,13 @@ function get_answer() {
     }
     gamesock.send(JSON.stringify(message));
   }
+}
+
+// Set category
+function set_category(){
+  var message = {
+    request_type: "set_category",
+    content: $('#category-select').val()
+  }
+  gamesock.send(JSON.stringify(message));
 }

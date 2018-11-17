@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url, include
 
+from game import views
+
 urlpatterns = [
     url('admin/', admin.site.urls),
-    url(r'game/', include('game.urls')),
+    url('^game/', include('game.urls')),
+    url('^$', views.home, name='home'),
 ]

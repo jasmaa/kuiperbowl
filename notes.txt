@@ -27,6 +27,8 @@ Request types
   - next
   - set_name
   - get_answer
+  - set_category
+  - set_difficulty
 
 ## response from server
 message = {
@@ -38,6 +40,7 @@ message = {
 	buzz_start_time:
 	current_question_content:{}
 	category:
+	room_category:
 	score_dict:{}
 }
 

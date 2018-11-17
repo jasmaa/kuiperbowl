@@ -26,3 +26,14 @@ $('#request-content').keypress(function(e) {
     answer();
   }
 });
+
+$('#category-select').change(function(e) {
+  set_category();
+});
+
+$('#buzz-btn').click(function(e) {
+  buzz();
+});
+$('#next-btn').click(function(e) {
+  next();
+});

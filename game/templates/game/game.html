@@ -1,14 +1,14 @@
 {% extends "game/base.html" %}
-
 {% block content %}
 
 <div class="container">
 
   <div class="row">
-    <div class="col-8">
-      <input type="text" id="request-content">
-      <div id="buzz-btn" class="btn btn-danger">Buzz</div>
 
+    <div class="col">
+      <input type="text" id="request-content" class="form-control">
+      <div id="next-btn" class="btn btn-info">Next</div>
+      <div id="buzz-btn" class="btn btn-danger float-right">Buzz</div>
       <div class="progress">
         <div id=content-progress class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         <div id=buzz-progress class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -16,26 +16,31 @@
     </div>
   </div>
 
+  <br>
+
   <div class="row">
-    <div class="col-8">
-      <div class="card bg-faded">
-        <div class="card-header">
-            <h6 id="category-header"></h6>
-            <h6 id="answer-header"></h6>
-        </div>
-        <div class="card-body">
-          <span id="question-space"></span>
-        </div>
-      </div>
-    </div>
 
     <div class="col-4">
       <div class="card">
+        <div class="card-header">Settings</div>
+        <div class="card-body">
+          Category:
+          <select id="category-select" class="form-control">
+            <option value="Everything">Everything</option>
+            <option value="Science">Science</option>
+            <option value="History">History</option>
+            <option value="Literature">Literature</option>
+          </select> Difficulty:
+          <select id="difficulty-select" class="form-control">
+          </select>
+        </div>
+      </div>
 
+      <br>
+
+      <div class="card">
         <div class="card-header">Scoreboard</div>
-
         <input type="text" id="name">
-
         <table class="table">
           <thead>
             <tr>
@@ -45,12 +50,29 @@
           </thead>
           <tbody id="scoreboard-body">
           </tbody>
-      </table>
-
+        </table>
       </div>
     </div>
 
+    <div class="col-8">
+      <div class="card bg-faded">
+        <div class="card-header">
+          <h6 id="category-header"></h6>
+          <h6 id="answer-header"></h6>
+        </div>
+        <div class="card-body">
+          <span id="question-space"></span>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="card">
+        Messages
+        <ul id="message-space">
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
-
 {% endblock %}
