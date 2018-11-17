@@ -7,6 +7,7 @@ import json
 import datetime
 import hashlib
 import random
+from fuzzywuzzy import fuzz
 
 @channel_session
 def ws_connect(message):
@@ -81,7 +82,20 @@ def ws_receive(message):
         # buzz answer
         if room.state == 'contest':
 
-            # evaluate answer here!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # fuzzy eval
+            ratio = fuzz.partial_ratio(data['content'], room.current_question.answer)
+            if ratio >= 60:
+                p = room.players.get(player_id=data['player_id'])
+                p.score += room.current_question.points
+                p.save()
+
+                # quick end question
+                room.end_time = room.start_time
+                room.save()
+            else:
+                p = room.players.get(player_id=data['player_id'])
+                p.score -= 10
+                p.save()
 
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'

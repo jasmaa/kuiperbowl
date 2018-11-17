@@ -12,6 +12,7 @@ var end_time;
 var buzz_start_time;
 var buzz_passed_time = 0;
 var grace_time = 3;
+var buzz_time = 5;
 
 var question;
 var category;
@@ -46,7 +47,7 @@ function update(){
   if(time_passed < duration){
 
     var buzz_progress = $('#buzz-progress');
-    buzz_progress.css('width', Math.round(100 * (1.3*buzz_passed_time / grace_time ))+'%');
+    buzz_progress.css('width', Math.round(100 * (1.1*buzz_passed_time / buzz_time ))+'%');
 
     if(game_state == 'playing'){
       buzz_passed_time = 0;
@@ -57,7 +58,7 @@ function update(){
       $('#buzz-progress').hide();
 
       var content_progress = $('#content-progress');
-      content_progress.css('width', Math.round(100 * (1.1*time_passed / duration ))+'%');
+      content_progress.css('width', Math.round(100 * (1.05*time_passed / duration ))+'%');
 
       $('#answer-header').html("");
     }
@@ -69,7 +70,7 @@ function update(){
       $('#buzz-progress').show();
 
       // auto answer if over buzz time
-      if(buzz_passed_time >= grace_time){
+      if(buzz_passed_time >= buzz_time){
         answer();
       }
       buzz_passed_time += 0.1;
@@ -83,8 +84,12 @@ function update(){
     if($('#answer-header').html() == ""){
         get_answer();
     }
+
     var content_progress = $('#content-progress');
     content_progress.css('width', '0%');
+
+    var question_space = $('#question-space');
+    question_space.html(question);
   }
 }
 
@@ -190,7 +195,7 @@ function answer(){
       player_id: player_id,
       current_time: Date.now(),
       request_type:"buzz_answer",
-      content:""
+      content:$('#request-content').val()
     }
     gamesock.send(JSON.stringify(message));
   }
