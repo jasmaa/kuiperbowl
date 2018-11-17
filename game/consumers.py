@@ -33,8 +33,9 @@ def ws_receive(message):
 
     elif(data['request_type'] == 'new_user'):
         # new user
+        # generate new id
         m = hashlib.md5()
-        m.update((label + str(room.players.count())).encode("utf8"))
+        m.update((label + str(datetime.datetime.now().timestamp())).encode("utf8"))
         player_id = int(m.hexdigest(), 16) % 1000000
         p = Player(player_id=player_id, name="Jerry", score=0, locked_out=False, room=room)
         p.save()
@@ -106,7 +107,15 @@ def ws_receive(message):
             Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'get_answer'):
+        update_time_state(room)
         if room.state == 'idle':
+            # generate random question for now if empty
+            if room.current_question == None:
+                questions = Question.objects.all()
+                q = random.choice(questions)
+                room.current_question = q
+                room.save()
+
             Group('game-'+label).send({'text':json.dumps({
                 "response_type":"send_answer",
                 "answer":room.current_question.answer,

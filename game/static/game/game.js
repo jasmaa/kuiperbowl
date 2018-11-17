@@ -52,6 +52,7 @@ function update() {
   question_body.html(curr_question_content);
 
   if(game_state == 'idle'){
+
     if ($('#answer-header').html() == "") {
       get_answer();
     }
@@ -90,6 +91,7 @@ function update() {
   // transition to idle if overtime while playing
   if (game_state == 'playing' && current_time >= end_time) {
     game_state = 'idle';
+    get_answer();
   }
 }
 
