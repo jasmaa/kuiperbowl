@@ -84,7 +84,7 @@ def ws_receive(message):
 
             # fuzzy eval
             ratio = fuzz.partial_ratio(data['content'], room.current_question.answer)
-            if ratio >= 60:
+            if data['content'].strip() != "" and ratio >= 60:
                 p = room.players.get(player_id=data['player_id'])
                 p.score += room.current_question.points
                 p.save()
@@ -121,9 +121,10 @@ def ws_disconnect(message):
 
 def update_time_state(room):
     """Checks time and updates state"""
-    if(datetime.datetime.now().timestamp() >= room.end_time):
-        room.state = 'idle'
-        room.save()
+    if not room.state == 'contest':
+        if datetime.datetime.now().timestamp() >= room.end_time:
+            room.state = 'idle'
+            room.save()
 
 def get_response_json(room):
     """Generates json for update response"""
