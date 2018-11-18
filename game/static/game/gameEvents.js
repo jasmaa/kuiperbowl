@@ -49,3 +49,6 @@ $('#next-btn').click(function(e) {
 $('#reset-btn').click(function(e) {
   reset_score();
 });
+$('#chat-btn').click(function(e) {
+  chat_init();
+});

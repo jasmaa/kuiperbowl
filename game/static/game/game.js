@@ -208,6 +208,7 @@ function buzz() {
 
     $('#next-btn').hide();
     $('#buzz-btn').hide();
+    $('#chat-btn').hide();
 
     game_state = 'contest';
     var message = {
@@ -234,6 +235,7 @@ function chat_init() {
 
     $('#next-btn').hide();
     $('#buzz-btn').hide();
+    $('#chat-btn').hide();
 
     setTimeout(function(){
       $('#request-content').focus();
@@ -246,6 +248,7 @@ function send_chat(){
 
     $('#next-btn').show();
     $('#buzz-btn').show();
+    $('#chat-btn').show();
     $('#request-content').hide();
     current_action = 'idle';
 
@@ -269,6 +272,7 @@ function answer() {
 
     $('#next-btn').show();
     $('#buzz-btn').show();
+    $('#chat-btn').show();
     $('#request-content').hide();
     game_state = 'playing';
     current_action = 'idle';

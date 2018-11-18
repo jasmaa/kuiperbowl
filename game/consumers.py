@@ -157,6 +157,8 @@ def ws_receive(message):
     elif(data['request_type'] == 'set_category'):
         try:
             room.category = clean_content(data['content'])
+            room.current_question = random.choice(Question.objects.all()) if room.current_question == None else room.current_question
+            room.buzz_player = room.players.first()
             room.full_clean()
             room.save()
 
