@@ -249,6 +249,10 @@ function send_chat(){
     $('#request-content').hide();
     current_action = 'idle';
 
+    if($('#request-content').val() == ""){
+      return;
+    }
+
     var message = {
       player_id: player_id,
       current_time: Date.now(),

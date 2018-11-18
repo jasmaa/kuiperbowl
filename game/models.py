@@ -28,11 +28,25 @@ class Room(models.Model):
     SCIENCE = 'Science'
     HISTORY = 'History'
     LITERATURE = 'Literature'
+    PHILOSOPHY = 'Philosophy'
+    RELIGION = 'Religion'
+    GEOGRAPHY = 'Geography'
+    FINE_ARTS = 'Fine Arts'
+    SOCIAL_SCIENCE = 'Social Science'
+    MYTHOLOGY = 'Mythology'
+    TRASH = 'Trash'
     categories = (
-        (EVERYTHING, 'Everything'),
-        (SCIENCE, 'Science'),
-        (HISTORY, 'History'),
-        (LITERATURE, 'Literature'),
+        (EVERYTHING, EVERYTHING),
+        (SCIENCE, SCIENCE),
+        (HISTORY, HISTORY),
+        (LITERATURE, LITERATURE),
+        (PHILOSOPHY, PHILOSOPHY),
+        (RELIGION, RELIGION),
+        (GEOGRAPHY, GEOGRAPHY),
+        (FINE_ARTS, FINE_ARTS),
+        (SOCIAL_SCIENCE, SOCIAL_SCIENCE),
+        (MYTHOLOGY, MYTHOLOGY),
+        (TRASH, TRASH),
     )
 
     label = models.SlugField(unique=True)

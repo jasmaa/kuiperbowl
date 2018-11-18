@@ -6,7 +6,7 @@
   <div class="row">
 
     <div class="col">
-      <input type="text" id="request-content" class="form-control">
+      <input type="text" id="request-content" class="form-control" maxlength="200">
       <div id="next-btn" class="btn btn-info btn-lg">Next</div>
       <div id="buzz-btn" class="btn btn-danger btn-lg float-right">Buzz</div>
       <div class="progress">
@@ -30,10 +30,18 @@
             <option value="Science">Science</option>
             <option value="History">History</option>
             <option value="Literature">Literature</option>
+            <option value="Philosophy">Philosophy</option>
+            <option value="Religion">Religion</option>
+            <option value="Geography">Geography</option>
+            <option value="Fine Arts">Fine Arts</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Mythology">Mythology</option>
+            <option value="Trash">Trash</option>
           </select>
 
           Difficulty:
           <select id="difficulty-select" class="form-control">
+            <option value="default">Default</option>
           </select>
 
           <div id="reset-btn" class="btn btn-secondary">Reset</div>
@@ -44,7 +52,7 @@
 
       <div class="card">
         <div class="card-header">Scoreboard</div>
-        <input type="text" id="name">
+        <input type="text" id="name" maxlength="20">
         <table class="table">
           <thead>
             <tr>
