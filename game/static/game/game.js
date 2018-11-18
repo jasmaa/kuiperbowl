@@ -6,6 +6,7 @@ var player_id;
 var locked_out;
 
 var game_state = 'idle';
+var current_action = 'idle';
 
 var current_time;
 var start_time;
@@ -125,7 +126,7 @@ gamesock.onmessage = function(message) {
     message_space.html("")
     for (i = 0; i < messages.length; i++) {
       var tag = messages[i][0]
-      var icon = '<i class="far fa-circle"></i>&nbsp'
+      var icon = '<i class="far fa-circle" style="color:#ffffff;"></i>&nbsp'
       if(tag == "buzz_correct"){
         icon = '<i class="far fa-circle" style="color:#00cc00;"></i>&nbsp'
       }
@@ -133,7 +134,7 @@ gamesock.onmessage = function(message) {
         icon = '<i class="far fa-circle" style="color:#cc0000;"></i>&nbsp'
       }
       else if(tag == "chat"){
-        icon = '<i class="far fa-comment-alt"></i>&nbsp'
+        icon = '<i class="far fa-comment-alt" style="color:#aaaaaa;"></i>&nbsp'
       }
 
       message_space.append('<li class="list-group-item">'+icon+messages[i][1]+'</li>')
@@ -199,9 +200,10 @@ function set_name() {
 // Buzz
 function buzz() {
   if (!locked_out && game_state == 'playing') {
+    current_action = 'buzz';
+
     $('#request-content').val('');
     $('#request-content').show();
-    $('#request-content').focus();
     buzz_passed_time = 0;
 
     $('#next-btn').hide();
@@ -215,6 +217,45 @@ function buzz() {
       content: ""
     }
     gamesock.send(JSON.stringify(message));
+
+    setTimeout(function(){
+      $('#request-content').focus();
+    }, 1);
+  }
+}
+
+// open chat
+function chat_init() {
+  if (current_action != 'buzz') {
+    current_action = 'chat';
+
+    $('#request-content').val('');
+    $('#request-content').show();
+
+    $('#next-btn').hide();
+    $('#buzz-btn').hide();
+
+    setTimeout(function(){
+      $('#request-content').focus();
+    }, 1);
+  }
+}
+
+function send_chat(){
+  if (current_action == 'chat') {
+
+    $('#next-btn').show();
+    $('#buzz-btn').show();
+    $('#request-content').hide();
+    current_action = 'idle';
+
+    var message = {
+      player_id: player_id,
+      current_time: Date.now(),
+      request_type: "chat",
+      content: $('#request-content').val()
+    }
+    gamesock.send(JSON.stringify(message));
   }
 }
 
@@ -226,6 +267,7 @@ function answer() {
     $('#buzz-btn').show();
     $('#request-content').hide();
     game_state = 'playing';
+    current_action = 'idle';
 
     var message = {
       player_id: player_id,

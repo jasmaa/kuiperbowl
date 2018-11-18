@@ -80,6 +80,6 @@ class Player(models.Model):
 class Message(models.Model):
     """Message that can be sent by Players"""
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
-    content = models.TextField()
+    content = models.CharField(max_length=200)
     tag = models.CharField(max_length=20)
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)

@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 from channels import Group
 from channels.sessions import channel_session
 from .models import *
@@ -55,9 +56,13 @@ def ws_receive(message):
         p = Player.objects.get(player_id=int(data['player_id']))
         old_name = p.name
         p.name = clean_content(data['content'])
-        p.save()
+        try:
+            p.full_clean()
+            p.save()
 
-        Group('game-'+label).send(get_response_json(room))
+            Group('game-'+label).send(get_response_json(room))
+        except ValidationError as e:
+            return
 
     elif(data['request_type'] == 'next'):
         # next question
@@ -70,6 +75,7 @@ def ws_receive(message):
             room.start_time = datetime.datetime.now().timestamp()
             room.end_time = room.start_time + q.duration
             room.current_question = q
+
             room.save()
 
             # unlock all players
@@ -149,11 +155,15 @@ def ws_receive(message):
             })});
 
     elif(data['request_type'] == 'set_category'):
-        room.category = data['content']
-        room.save()
+        try:
+            room.category = clean_content(data['content'])
+            room.full_clean()
+            room.save()
 
-        create_message("set_category", f"The category is now <strong><i>{room.category}</i></strong>", room)
-        Group('game-'+label).send(get_response_json(room))
+            create_message("set_category", f"The category is now <strong><i>{room.category}</i></strong>", room)
+            Group('game-'+label).send(get_response_json(room))
+        except ValidationError as e:
+            pass
 
     elif(data['request_type'] == 'reset_score'):
         p = room.players.get(player_id=data['player_id'])
@@ -162,6 +172,14 @@ def ws_receive(message):
 
         create_message("reset_score", f"<strong>{p.name}</strong> has reset their score", room)
         Group('game-'+label).send(get_response_json(room))
+
+    elif(data['request_type'] == 'chat'):
+        p = room.players.get(player_id=data['player_id'])
+        m = clean_content(data['content'])
+
+        create_message("chat", f"<strong>{p.name}</strong>: {m}", room)
+        Group('game-'+label).send(get_response_json(room))
+
 
 @channel_session
 def ws_disconnect(message):
@@ -195,5 +213,9 @@ def get_response_json(room):
     })}
 
 def create_message(tag, content, room):
-    m = Message(content=content, room=room, tag=tag)
-    m.save()
+    try:
+        m = Message(content=content, room=room, tag=tag)
+        m.full_clean()
+        m.save()
+    except ValidationError as e:
+        return

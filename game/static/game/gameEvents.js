@@ -17,13 +17,22 @@ $(document).keypress(function(e) {
     }
     else if(e.which == 32){
       buzz();
+      e.preventDefault();
+    }
+    else if(e.which == 99){
+      chat_init();
     }
   }
 });
 
 $('#request-content').keypress(function(e) {
   if(e.which == 13){
-    answer();
+    if(current_action == 'buzz'){
+      answer();
+    }
+    else if(current_action == 'chat'){
+      send_chat();
+    }
   }
 });
 

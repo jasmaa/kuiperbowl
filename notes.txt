@@ -30,6 +30,7 @@ Request types
   - set_category
   - set_difficulty
   - reset_score
+  - chat
 
 ## response from server
 message = {
