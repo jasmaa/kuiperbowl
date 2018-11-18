@@ -18,7 +18,8 @@ var buzz_time = 8;
 var question;
 var category;
 var curr_question_content;
-var score_dict;
+var scores;
+var messages;
 
 // Set up client
 function setup() {
@@ -111,12 +112,19 @@ gamesock.onmessage = function(message) {
     question = data.current_question_content;
     category = data.category;
     scores = data.scores;
+    messages = data.messages
 
     // update ui
     var scoreboard = $('#scoreboard-body');
     scoreboard.html("")
     for (i = 0; i < scores.length; i++) {
       scoreboard.append("<tr><td>" + scores[i][0] + "</td><td>" + scores[i][1] + "</td></tr>")
+    }
+
+    var message_space = $('#message-space');
+    message_space.html("")
+    for (i = 0; i < messages.length; i++) {
+      message_space.append("<li>"+messages[i]+"</li>")
     }
 
     $('#category-header').html("Category: " + category);

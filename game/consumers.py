@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404
 from channels import Group
 from channels.sessions import channel_session
 from .models import *
+from .utils import *
+
 import json
 import datetime
 import hashlib
@@ -51,7 +53,8 @@ def ws_receive(message):
     elif(data['request_type'] == 'set_name'):
         # update name
         p = Player.objects.get(player_id=int(data['player_id']))
-        p.name = data['content']
+        old_name = p.name
+        p.name = clean_content(data['content'])
         p.save()
 
         Group('game-'+label).send(get_response_json(room))
@@ -87,6 +90,7 @@ def ws_receive(message):
             room.buzz_start_time = datetime.datetime.now().timestamp()
             room.save()
 
+            create_message(f"<strong>{p.name}</strong> has buzzed", room)
             Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'buzz_answer'):
@@ -96,21 +100,26 @@ def ws_receive(message):
 
         if not p.locked_out and room.state == 'contest':
             # fuzzy eval
-            ratio = fuzz.partial_ratio(data['content'], room.current_question.answer)
+            cleaned_content = clean_content(data['content'])
+            ratio = fuzz.partial_ratio(cleaned_content, room.current_question.answer)
 
-            if data['content'].strip() != "" and ratio >= 60:
+            if cleaned_content != "" and ratio >= 60:
                 p.score += room.current_question.points
                 p.save()
 
                 # quick end question
                 room.end_time = room.start_time
                 room.save()
+
+                create_message(f"<strong>{p.name}</strong> correctly answered <strong><i>{cleaned_content}</i></strong>", room)
             else:
                 # question going ended do penalty
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
                     p.score -= 10
                 p.locked_out = True
                 p.save()
+
+                create_message(f"<strong>{p.name}</strong> incorrectly answered <strong><i>{cleaned_content}</i></strong>", room)
 
                 message.reply_channel.send({'text':json.dumps({
                     "response_type":"lock_out",
@@ -177,4 +186,9 @@ def get_response_json(room):
         "category":room.current_question.category if room.current_question != None else "",
         "room_category":room.category,
         "scores":room.get_scores(),
+        "messages":room.get_messages(),
     })}
+
+def create_message(content, room):
+    m = Message(content=content, room=room)
+    m.save()
