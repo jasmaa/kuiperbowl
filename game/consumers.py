@@ -9,6 +9,8 @@ import hashlib
 import random
 from fuzzywuzzy import fuzz
 
+GRACE_TIME = 3
+
 @channel_session
 def ws_connect(message):
     # get room
@@ -67,11 +69,19 @@ def ws_receive(message):
             room.current_question = q
             room.save()
 
+            # unlock all players
+            for p in room.players.all():
+                p.locked_out = False
+                p.save()
+
             Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'buzz_init'):
         # buzz init
-        if room.state == 'playing':
+
+        p = room.players.get(player_id=data['player_id'])
+
+        if not p.locked_out and room.state == 'playing':
             room.state = 'contest'
             room.buzz_player = room.players.get(player_id=data['player_id'])
             room.buzz_start_time = datetime.datetime.now().timestamp()
@@ -81,12 +91,14 @@ def ws_receive(message):
 
     elif(data['request_type'] == 'buzz_answer'):
         # buzz answer
-        if room.state == 'contest':
 
+        p = room.players.get(player_id=data['player_id'])
+
+        if not p.locked_out and room.state == 'contest':
             # fuzzy eval
             ratio = fuzz.partial_ratio(data['content'], room.current_question.answer)
+
             if data['content'].strip() != "" and ratio >= 60:
-                p = room.players.get(player_id=data['player_id'])
                 p.score += room.current_question.points
                 p.save()
 
@@ -94,9 +106,15 @@ def ws_receive(message):
                 room.end_time = room.start_time
                 room.save()
             else:
-                p = room.players.get(player_id=data['player_id'])
-                p.score -= 10
+                # question going ended do penalty
+                if room.end_time - room.buzz_start_time >= GRACE_TIME:
+                    p.score -= 10
+                p.locked_out = True
                 p.save()
+
+                message.reply_channel.send({'text':json.dumps({
+                    "response_type":"lock_out",
+                })})
 
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'
@@ -125,12 +143,18 @@ def ws_receive(message):
         room.category = data['content']
         room.save()
 
+    elif(data['request_type'] == 'reset_score'):
+        p = room.players.get(player_id=data['player_id'])
+        p.score = 0
+        p.save()
+        Group('game-'+label).send(get_response_json(room))
+
 @channel_session
 def ws_disconnect(message):
     label = message.channel_session['room']
-    Group('chat-'+label).discard(message.reply_channel)
+    Group('game-'+label).discard(message.reply_channel)
 
-# Helper methods
+# === Helper methods ===
 
 def update_time_state(room):
     """Checks time and updates state"""

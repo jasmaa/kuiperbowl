@@ -29,6 +29,7 @@ Request types
   - get_answer
   - set_category
   - set_difficulty
+  - reset_score
 
 ## response from server
 message = {

@@ -37,3 +37,6 @@ $('#buzz-btn').click(function(e) {
 $('#next-btn').click(function(e) {
   next();
 });
+$('#reset-btn').click(function(e) {
+  reset_score();
+});

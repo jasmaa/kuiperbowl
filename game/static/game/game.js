@@ -3,6 +3,7 @@ var gamesock = new ReconnectingWebSocket(ws_scheme + '://' + window.location.hos
 
 var player_name;
 var player_id;
+var locked_out;
 
 var game_state = 'idle';
 
@@ -12,7 +13,7 @@ var end_time;
 var buzz_start_time;
 var buzz_passed_time = 0;
 var grace_time = 3;
-var buzz_time = 5;
+var buzz_time = 8;
 
 var question;
 var category;
@@ -126,6 +127,7 @@ gamesock.onmessage = function(message) {
     setCookie('player_name', data.player_name);
     player_id = data.player_id;
     player_name = data.player_name;
+    locked_out = false;
 
     // Update name
     $('#name').val(player_name);
@@ -133,6 +135,10 @@ gamesock.onmessage = function(message) {
   }
   else if (data.response_type == "send_answer") {
     $('#answer-header').html("Answer: " + data.answer);
+  }
+  else if(data.response_type == "lock_out"){
+    locked_out = true;
+    setCookie('locked_out', locked_out);
   }
 }
 
@@ -172,7 +178,7 @@ function set_name() {
 
 // Buzz
 function buzz() {
-  if (game_state == 'playing') {
+  if (!locked_out && game_state == 'playing') {
     $('#request-content').val('');
     $('#request-content').show();
     $('#request-content').focus();
@@ -217,6 +223,9 @@ function next() {
     var question_body = $('#question-space');
     question_body.html("");
 
+    locked_out = false;
+    setCookie('locked_out', locked_out);
+
     var message = {
       player_id: player_id,
       current_time: Date.now(),
@@ -242,6 +251,14 @@ function set_category(){
   var message = {
     request_type: "set_category",
     content: $('#category-select').val()
+  }
+  gamesock.send(JSON.stringify(message));
+}
+
+function reset_score(){
+  var message = {
+    player_id: player_id,
+    request_type: "reset_score",
   }
   gamesock.send(JSON.stringify(message));
 }
