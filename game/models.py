@@ -62,7 +62,7 @@ class Room(models.Model):
     def get_messages(self):
         chrono_messages = []
         for m in self.messages.order_by('timestamp').reverse():
-            chrono_messages.append(m.content)
+            chrono_messages.append( (m.tag, m.content) )
         return chrono_messages
 
 class Player(models.Model):
@@ -81,4 +81,5 @@ class Message(models.Model):
     """Message that can be sent by Players"""
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
     content = models.TextField()
+    tag = models.CharField(max_length=20)
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)

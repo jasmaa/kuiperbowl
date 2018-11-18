@@ -90,7 +90,7 @@ def ws_receive(message):
             room.buzz_start_time = datetime.datetime.now().timestamp()
             room.save()
 
-            create_message(f"<strong>{p.name}</strong> has buzzed", room)
+            create_message("buzz_init", f"<strong>{p.name}</strong> has buzzed", room)
             Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'buzz_answer'):
@@ -111,7 +111,7 @@ def ws_receive(message):
                 room.end_time = room.start_time
                 room.save()
 
-                create_message(f"<strong>{p.name}</strong> correctly answered <strong><i>{cleaned_content}</i></strong>", room)
+                create_message("buzz_correct", f"<strong>{p.name}</strong> correctly answered <strong><i>{cleaned_content}</i></strong>", room)
             else:
                 # question going ended do penalty
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
@@ -119,7 +119,7 @@ def ws_receive(message):
                 p.locked_out = True
                 p.save()
 
-                create_message(f"<strong>{p.name}</strong> incorrectly answered <strong><i>{cleaned_content}</i></strong>", room)
+                create_message("buzz_wrong", f"<strong>{p.name}</strong> incorrectly answered <strong><i>{cleaned_content}</i></strong>", room)
 
                 message.reply_channel.send({'text':json.dumps({
                     "response_type":"lock_out",
@@ -152,10 +152,15 @@ def ws_receive(message):
         room.category = data['content']
         room.save()
 
+        create_message("set_category", f"The category is now <strong><i>{room.category}</i></strong>", room)
+        Group('game-'+label).send(get_response_json(room))
+
     elif(data['request_type'] == 'reset_score'):
         p = room.players.get(player_id=data['player_id'])
         p.score = 0
         p.save()
+
+        create_message("reset_score", f"<strong>{p.name}</strong> has reset their score", room)
         Group('game-'+label).send(get_response_json(room))
 
 @channel_session
@@ -189,6 +194,6 @@ def get_response_json(room):
         "messages":room.get_messages(),
     })}
 
-def create_message(content, room):
-    m = Message(content=content, room=room)
+def create_message(tag, content, room):
+    m = Message(content=content, room=room, tag=tag)
     m.save()

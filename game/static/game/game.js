@@ -124,7 +124,19 @@ gamesock.onmessage = function(message) {
     var message_space = $('#message-space');
     message_space.html("")
     for (i = 0; i < messages.length; i++) {
-      message_space.append("<li>"+messages[i]+"</li>")
+      var tag = messages[i][0]
+      var icon = '<i class="far fa-circle"></i>&nbsp'
+      if(tag == "buzz_correct"){
+        icon = '<i class="far fa-circle" style="color:#00cc00;"></i>&nbsp'
+      }
+      else if(tag == "buzz_wrong"){
+        icon = '<i class="far fa-circle" style="color:#cc0000;"></i>&nbsp'
+      }
+      else if(tag == "chat"){
+        icon = '<i class="far fa-comment-alt"></i>&nbsp'
+      }
+
+      message_space.append('<li class="list-group-item">'+icon+messages[i][1]+'</li>')
     }
 
     $('#category-header').html("Category: " + category);
