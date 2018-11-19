@@ -56,7 +56,7 @@ def ws_receive(message):
         m = hashlib.md5()
         m.update((label + str(datetime.datetime.now().timestamp())).encode("utf8"))
         player_id = int(m.hexdigest(), 16) % 1000000
-        p = Player(player_id=player_id, name="Jerry", score=0, locked_out=False, room=room)
+        p = Player(player_id=player_id, name=generate_name(), score=0, locked_out=False, room=room)
         p.save()
 
         message.reply_channel.send({'text':json.dumps({
