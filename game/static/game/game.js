@@ -30,6 +30,8 @@ function setup() {
     new_user();
   }
   ping();
+  join();
+
   $('#name').val(player_name);
   $('#request-content').hide();
 
@@ -173,6 +175,26 @@ function ping() {
     player_id: player_id,
     current_time: Date.now(),
     request_type: "ping",
+    content: ""
+  }
+  gamesock.send(JSON.stringify(message));
+}
+
+function join() {
+  var message = {
+    player_id: player_id,
+    current_time: Date.now(),
+    request_type: "join",
+    content: ""
+  }
+  gamesock.send(JSON.stringify(message));
+}
+
+function leave() {
+  var message = {
+    player_id: player_id,
+    current_time: Date.now(),
+    request_type: "leave",
     content: ""
   }
   gamesock.send(JSON.stringify(message));

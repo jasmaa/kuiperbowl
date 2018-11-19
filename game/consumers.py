@@ -40,6 +40,16 @@ def ws_receive(message):
         update_time_state(room)
         message.reply_channel.send(get_response_json(room))
 
+    elif(data['request_type'] == 'join'):
+        p = room.players.get(player_id=data['player_id'])
+        create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+        Group('game-'+label).send(get_response_json(room))
+
+    elif(data['request_type'] == 'leave'):
+        p = room.players.get(player_id=data['player_id'])
+        create_message("leave", f"<strong>{p.name}</strong> has left the room", room)
+        Group('game-'+label).send(get_response_json(room))
+
     elif(data['request_type'] == 'new_user'):
         # new user
         # generate new id
@@ -54,6 +64,9 @@ def ws_receive(message):
             "player_id":p.player_id,
             "player_name":p.name,
         })})
+
+        create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+        Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'set_name'):
         # update name

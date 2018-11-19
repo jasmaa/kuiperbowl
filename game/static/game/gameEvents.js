@@ -8,6 +8,10 @@ window.setTimeout(setup, 600);
 window.setInterval(ping, 5000);
 window.setInterval(update, 100);
 
+$(window).on("unload", function(e) {
+  leave();
+});
+
 // JQuery events
 
 $('#name').on('input', function() {
