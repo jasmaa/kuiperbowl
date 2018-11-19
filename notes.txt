@@ -59,7 +59,6 @@ message = {
     - label (room name as url)
 	- state: IDLE, PLAYING, CONTEST, etc?
 	- players
-	- locked_out_players
 	
 	- current_question
 	- start_time
@@ -70,8 +69,12 @@ message = {
 	- buzz_end_time
 	
   - Player: a player
+    - player_id
+	- room
     - name
 	- score
+	- locked_out
+	- last_seen
 
   - Question: a stored question in db
     - category

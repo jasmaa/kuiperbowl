@@ -1,4 +1,7 @@
 // Events in game
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
 
 // timed events
 window.setTimeout(setup, 600);
@@ -6,6 +9,7 @@ window.setInterval(ping, 5000);
 window.setInterval(update, 100);
 
 // JQuery events
+
 $('#name').on('input', function() {
   set_name();
 });
@@ -47,7 +51,9 @@ $('#next-btn').click(function(e) {
   next();
 });
 $('#reset-btn').click(function(e) {
-  reset_score();
+  if(confirm("Are you sure you want to reset?")){
+      reset_score();
+  }
 });
 $('#chat-btn').click(function(e) {
   chat_init();

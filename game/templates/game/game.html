@@ -7,9 +7,9 @@
 
     <div class="col">
       <input type="text" id="request-content" class="form-control" maxlength="200">
-      <div id="chat-btn" class="btn btn-secondary btn-lg">Chat</div>
-      <div id="next-btn" class="btn btn-info btn-lg">Next</div>
-      <div id="buzz-btn" class="btn btn-danger btn-lg float-right">Buzz</div>
+      <div id="chat-btn" class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Shortcut: C">Chat</div>
+      <div id="next-btn" class="btn btn-info btn-lg" data-toggle="tooltip" data-placement="top" title="Shortcut: N">Next</div>
+      <div id="buzz-btn" class="btn btn-danger btn-lg float-right" data-toggle="tooltip" data-placement="top" title="Shortcut: SPACE">Buzz</div>
       <div class="progress">
         <div id=content-progress class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         <div id=buzz-progress class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -46,6 +46,7 @@
           </select>
 
           <div id="reset-btn" class="btn btn-secondary">Reset</div>
+
         </div>
       </div>
 

@@ -33,6 +33,10 @@ def ws_receive(message):
     # determine request type
     if(data['request_type'] == 'ping'):
         # update ping
+        p = room.players.get(player_id=data['player_id'])
+        p.last_seen = datetime.datetime.now().timestamp()
+        p.save()
+
         update_time_state(room)
         message.reply_channel.send(get_response_json(room))
 

@@ -68,14 +68,15 @@ class Room(models.Model):
     def get_scores(self):
         scores = []
         for player in self.players.all():
-            scores.append((player.name, player.score))
+            active = datetime.datetime.now().timestamp() - player.last_seen < 10
+            scores.append((player.name, player.score, active))
         scores.sort(key=lambda tup: tup[1])
         scores.reverse()
         return scores
 
     def get_messages(self):
         chrono_messages = []
-        for m in self.messages.order_by('timestamp').reverse():
+        for m in self.messages.order_by('timestamp').reverse()[:50]:
             chrono_messages.append( (m.tag, m.content) )
         return chrono_messages
 
@@ -87,6 +88,7 @@ class Player(models.Model):
     name = models.CharField(max_length=20)
     score = models.IntegerField()
     locked_out = models.BooleanField()
+    last_seen = models.FloatField(default=datetime.datetime.now().timestamp())
 
     def __str__(self):
         return self.name + ":" + str(self.player_id)

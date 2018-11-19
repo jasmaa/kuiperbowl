@@ -119,7 +119,11 @@ gamesock.onmessage = function(message) {
     var scoreboard = $('#scoreboard-body');
     scoreboard.html("")
     for (i = 0; i < scores.length; i++) {
-      scoreboard.append("<tr><td>" + scores[i][0] + "</td><td>" + scores[i][1] + "</td></tr>")
+      var icon = '<i class="fas fa-circle" style="color:#aaaaaa;"></i>&nbsp'
+      if(scores[i][2]){
+        icon = '<i class="fas fa-circle" style="color:#00ff00;"></i>&nbsp'
+      }
+      scoreboard.append("<tr><td>" + icon + scores[i][0] + "</td><td>" + scores[i][1] + "</td></tr>")
     }
 
     var message_space = $('#message-space');
@@ -325,6 +329,7 @@ function set_category(){
   gamesock.send(JSON.stringify(message));
 }
 
+// resets score
 function reset_score(){
   var message = {
     player_id: player_id,
