@@ -58,6 +58,9 @@ function update() {
 
   if(game_state == 'idle'){
 
+    locked_out = false;
+    setCookie('locked_out', locked_out);
+
     if ($('#answer-header').html() == "") {
       get_answer();
     }
@@ -318,9 +321,6 @@ function next() {
   if (game_state == 'idle') {
     var question_body = $('#question-space');
     question_body.html("");
-
-    locked_out = false;
-    setCookie('locked_out', locked_out);
 
     var message = {
       player_id: player_id,
