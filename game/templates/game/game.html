@@ -1,6 +1,11 @@
 {% extends "game/base.html" %}
-{% block content %}
+{% load static %}
 
+{% block title %}
+  <title>Kuiperbowl - {{ room.label }}</title>
+{% endblock %}
+
+{% block content %}
 <div class="container">
 
   <div class="row">
@@ -43,6 +48,13 @@
           Difficulty:
           <select id="difficulty-select" class="form-control">
             <option value="default">Default</option>
+          </select>
+
+          Theme:
+          <select id="theme-select" class="form-control my-2 my-sm-0">
+            <option value="default">Default</option>
+            <option value="darkly">Darkly</option>
+            <option value="sketchy">Sketchy</option>
           </select>
 
           <div id="reset-btn" class="btn btn-secondary">Reset</div>
@@ -88,4 +100,11 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.js"></script>
+  <script type="text/javascript" src={% static "game/game.js" %}></script>
+  <script type="text/javascript" src={% static "game/userdata.js" %}></script>
+  <script type="text/javascript" src={% static "game/gameEvents.js" %}></script>
 {% endblock %}

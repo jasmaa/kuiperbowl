@@ -1,59 +1,44 @@
+{% extends "game/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<head>
-  <title>Quizbowl Site</title>
-</head>
+{% block title %}
+  <title>Kuiperbowl - Home</title>
+{% endblock %}
 
-<body>
-
-  {% include "game/navbar.html" %}
-
+{% block content %}
   <div class="container">
-    <div class="row">
-      <div class="col-12">
+  <br>
+  <div class="jumbotron">
 
-        <br>
-        <div class="jumbotron">
+    <h1 class="display-4">Welcome to Kuiperbowl</h1>
 
-          <h1 class="display-4">Welcome to Kuiperbowl</h1>
+    <p class="lead">
+      Kuiperbowl is a real-time multiplayer trivia game. It's actually just Protobowl but significantly worse. To enjoy the jank, please join one of the default rooms below, or you can make your own by typing in the field.
+    </p>
 
-          <p class="lead">
-            Kuiperbowl is a real-time multiplayer trivia game. It's actually just Protobowl but significantly worse. To enjoy the jank, please join one of the default rooms below, or you can make your own by typing in the field.
-          </p>
-
-          <br>
-          <div class="container">
-            <div class="center" style="text-align:center;">
-              <a class="btn btn-secondary" href="/game/hs">HS</a>
-              <a class="btn btn-secondary" href="/game/ms">MS</a>
-              <a class="btn btn-secondary" href="/game/college">College</a>
-              <a class="btn btn-secondary" href="/game/trash">Trash</a>
-            </div>
-            <div class="input-group mb-3 center">
-              <input id="landing-content" type="text" class="form-control" placeholder="awesome-room">
-              <div class="input-group-append">
-                <button id="landing-btn" class="btn btn-success" type="button">Go!</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="center" style="text-align:center;">
-            {% include "game/donate-button.html" %}
-          </div>
-
+    <br>
+    <div class="container">
+      <div class="center" style="text-align:center;">
+        <a class="btn btn-secondary" href="/game/hs">HS</a>
+        <a class="btn btn-secondary" href="/game/ms">MS</a>
+        <a class="btn btn-secondary" href="/game/college">College</a>
+        <a class="btn btn-secondary" href="/game/trash">Trash</a>
+      </div>
+      <div class="input-group mb-3 center">
+        <input id="landing-content" type="text" class="form-control" placeholder="awesome-room">
+        <div class="input-group-append">
+          <button id="landing-btn" class="btn btn-success" type="button">Go!</button>
         </div>
       </div>
     </div>
+
+    <div class="center" style="text-align:center;">
+      {% include "game/donate-button.html" %}
+    </div>
   </div>
+</div>
+{% endblock %}
 
-</body>
-
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href={% static "game/game.css" %}>
-<script src={% static "game/home.js" %}></script>
-
-</html>
+{% block scripts %}
+  <script src={% static "game/home.js" %}></script>
+{% endblock %}

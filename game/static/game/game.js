@@ -22,6 +22,12 @@ var curr_question_content;
 var scores;
 var messages;
 
+var theme_map = {
+  "default":"https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css",
+  "darkly":"https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/darkly/bootstrap.min.css",
+  "sketchy":"https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/sketchy/bootstrap.min.css"
+};
+
 // Set up client
 function setup() {
   // set up user
@@ -357,4 +363,9 @@ function reset_score(){
     request_type: "reset_score",
   }
   gamesock.send(JSON.stringify(message));
+}
+
+// changes bootswatch theme
+function change_theme(){
+  $('#theme-stylesheet').attr('href', theme_map[$('#theme-select').val()]);
 }

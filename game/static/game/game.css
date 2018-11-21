@@ -7,3 +7,7 @@
     width: 40%;
     padding: 10px;
 }
+
+.navbar .navbar-brand img {
+  height: 30px;
+}
