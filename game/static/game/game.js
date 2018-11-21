@@ -29,8 +29,10 @@ function setup() {
   if (player_id == undefined) {
     new_user();
   }
-  ping();
-  join();
+  else{
+    ping();
+    join();
+  }
 
   $('#name').val(player_name);
   $('#request-content').hide();
@@ -135,18 +137,24 @@ gamesock.onmessage = function(message) {
     message_space.html("")
     for (i = 0; i < messages.length; i++) {
       var tag = messages[i][0]
-      var icon = '<i class="far fa-circle" style="color:#ffffff;"></i>&nbsp'
+      var icon = '<i class="far fa-circle" style="color:#ffffff;"></i>&nbsp';
       if(tag == "buzz_correct"){
-        icon = '<i class="far fa-circle" style="color:#00cc00;"></i>&nbsp'
+        icon = '<i class="far fa-circle" style="color:#00cc00;"></i>&nbsp';
       }
       else if(tag == "buzz_wrong"){
-        icon = '<i class="far fa-circle" style="color:#cc0000;"></i>&nbsp'
+        icon = '<i class="far fa-circle" style="color:#cc0000;"></i>&nbsp';
       }
       else if(tag == "chat"){
-        icon = '<i class="far fa-comment-alt" style="color:#aaaaaa;"></i>&nbsp'
+        icon = '<i class="far fa-comment-alt" style="color:#aaaaaa;"></i>&nbsp';
+      }
+      else if(tag == "leave"){
+        icon = '<i class="fas fa-door-open" style="color:#99bbff;"></i>&nbsp';
+      }
+      else if(tag == "join"){
+        icon = '<i class="fas fa-sign-in-alt" style="color:#99bbff;"></i>&nbsp';
       }
 
-      message_space.append('<li class="list-group-item">'+icon+messages[i][1]+'</li>')
+      message_space.append('<li class="list-group-item">'+icon+messages[i][1]+'</li>');
     }
 
     $('#category-header').html("Category: " + category);
@@ -176,7 +184,6 @@ gamesock.onmessage = function(message) {
 function ping() {
   var message = {
     player_id: player_id,
-    current_time: Date.now(),
     request_type: "ping",
     content: ""
   }
@@ -186,7 +193,6 @@ function ping() {
 function join() {
   var message = {
     player_id: player_id,
-    current_time: Date.now(),
     request_type: "join",
     content: ""
   }
@@ -196,7 +202,6 @@ function join() {
 function leave() {
   var message = {
     player_id: player_id,
-    current_time: Date.now(),
     request_type: "leave",
     content: ""
   }
@@ -207,7 +212,6 @@ function leave() {
 function new_user() {
   var message = {
     player_id: player_id,
-    current_time: Date.now(),
     request_type: "new_user",
     content: ""
   }
@@ -219,7 +223,6 @@ function set_name() {
   setCookie('player_name', $('#name').val());
   var message = {
     player_id: player_id,
-    current_time: Date.now(),
     request_type: "set_name",
     content: $('#name').val()
   }
@@ -242,7 +245,6 @@ function buzz() {
     game_state = 'contest';
     var message = {
       player_id: player_id,
-      current_time: Date.now(),
       request_type: "buzz_init",
       content: ""
     }
@@ -287,7 +289,6 @@ function send_chat(){
 
     var message = {
       player_id: player_id,
-      current_time: Date.now(),
       request_type: "chat",
       content: $('#request-content').val()
     }
@@ -308,7 +309,6 @@ function answer() {
 
     var message = {
       player_id: player_id,
-      current_time: Date.now(),
       request_type: "buzz_answer",
       content: $('#request-content').val()
     }
@@ -324,7 +324,6 @@ function next() {
 
     var message = {
       player_id: player_id,
-      current_time: Date.now(),
       request_type: "next",
       content: ""
     }

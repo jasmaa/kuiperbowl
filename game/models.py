@@ -6,6 +6,7 @@ import datetime
 
 class Question(models.Model):
     """Quizbowl current_question"""
+
     category = models.TextField()
     points = models.IntegerField()
     content = models.TextField()
@@ -67,7 +68,7 @@ class Room(models.Model):
 
     def get_scores(self):
         scores = []
-        for player in self.players.all():
+        for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
             scores.append((player.name, player.score, active))
         scores.sort(key=lambda tup: tup[1])
@@ -95,6 +96,7 @@ class Player(models.Model):
 
 class Message(models.Model):
     """Message that can be sent by Players"""
+
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
     content = models.CharField(max_length=200)
     tag = models.CharField(max_length=20)

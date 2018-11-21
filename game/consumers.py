@@ -33,17 +33,29 @@ def ws_receive(message):
     # determine request type
     if(data['request_type'] == 'ping'):
         # update ping
-        p = room.players.get(player_id=data['player_id'])
-        p.last_seen = datetime.datetime.now().timestamp()
-        p.save()
+        try:
+            p = room.players.get(player_id=data['player_id'])
+            p.last_seen = datetime.datetime.now().timestamp()
+            p.save()
 
-        update_time_state(room)
-        message.reply_channel.send(get_response_json(room))
+            update_time_state(room)
+            message.reply_channel.send(get_response_json(room))
+        except Exception as e:
+            p = create_new_user(room)
+
+            message.reply_channel.send({'text':json.dumps({
+                "response_type":"new_user",
+                "player_id":p.player_id,
+                "player_name":p.name,
+            })})
+
+            create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+            Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'join'):
-        p = room.players.get(player_id=data['player_id'])
-        create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
-        Group('game-'+label).send(get_response_json(room))
+            p = room.players.get(player_id=data['player_id'])
+            create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+            Group('game-'+label).send(get_response_json(room))
 
     elif(data['request_type'] == 'leave'):
         p = room.players.get(player_id=data['player_id'])
@@ -52,12 +64,7 @@ def ws_receive(message):
 
     elif(data['request_type'] == 'new_user'):
         # new user
-        # generate new id
-        m = hashlib.md5()
-        m.update((label + str(datetime.datetime.now().timestamp())).encode("utf8"))
-        player_id = int(m.hexdigest(), 16) % 1000000
-        p = Player(player_id=player_id, name=generate_name(), score=0, locked_out=False, room=room)
-        p.save()
+        p = create_new_user(room)
 
         message.reply_channel.send({'text':json.dumps({
             "response_type":"new_user",
@@ -136,7 +143,7 @@ def ws_receive(message):
 
                 create_message("buzz_correct", f"<strong>{p.name}</strong> correctly answered <strong><i>{cleaned_content}</i></strong>", room)
             else:
-                # question going ended do penalty
+                # question reading ended, do penalty
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
                     p.score -= 10
                 p.locked_out = True
@@ -232,9 +239,21 @@ def get_response_json(room):
     })}
 
 def create_message(tag, content, room):
+    """Adds a message to db"""
     try:
         m = Message(content=content, room=room, tag=tag)
         m.full_clean()
         m.save()
     except ValidationError as e:
         return
+
+def create_new_user(room):
+    """Generates new user"""
+    # generate new id
+    m = hashlib.md5()
+    m.update((room.label + str(datetime.datetime.now().timestamp())).encode("utf8"))
+    player_id = int(m.hexdigest(), 16) % 1000000
+    p = Player(player_id=player_id, name=generate_name(), score=0, locked_out=False, room=room)
+    p.save()
+
+    return p
