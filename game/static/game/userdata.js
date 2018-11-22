@@ -11,6 +11,10 @@ function setCookie(name, val){
   document.cookie = name+"="+val;
 }
 
+function setCookieAndPath(name, val, path){
+  document.cookie = name+"="+val+"; path="+path;
+}
+
 // I stole this
 function cookieToDict(str) {
     str = str.split('; ');

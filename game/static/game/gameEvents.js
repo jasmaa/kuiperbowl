@@ -62,7 +62,3 @@ $('#reset-btn').click(function(e) {
 $('#chat-btn').click(function(e) {
   chat_init();
 });
-
-$('#theme-select').change(function(e) {
-  change_theme();
-});
