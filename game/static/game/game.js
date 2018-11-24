@@ -349,6 +349,15 @@ function set_category(){
   gamesock.send(JSON.stringify(message));
 }
 
+// Set difficulty
+function set_difficulty(){
+  var message = {
+    request_type: "set_difficulty",
+    content: $('#difficulty-select').val()
+  }
+  gamesock.send(JSON.stringify(message));
+}
+
 // resets score
 function reset_score(){
   var message = {

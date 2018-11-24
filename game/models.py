@@ -7,11 +7,12 @@ import datetime
 class Question(models.Model):
     """Quizbowl current_question"""
 
-    category = models.TextField()
+    category = models.TextField(default="Everything")
     points = models.IntegerField()
     content = models.TextField()
     answer = models.TextField()
     duration = models.FloatField()
+    difficulty = models.TextField(default="HS")
 
 class Room(models.Model):
     """Room to play quizbowl"""
@@ -37,17 +38,26 @@ class Room(models.Model):
     MYTHOLOGY = 'Mythology'
     TRASH = 'Trash'
     categories = (
-        (EVERYTHING, EVERYTHING),
-        (SCIENCE, SCIENCE),
-        (HISTORY, HISTORY),
-        (LITERATURE, LITERATURE),
-        (PHILOSOPHY, PHILOSOPHY),
-        (RELIGION, RELIGION),
-        (GEOGRAPHY, GEOGRAPHY),
-        (FINE_ARTS, FINE_ARTS),
-        (SOCIAL_SCIENCE, SOCIAL_SCIENCE),
-        (MYTHOLOGY, MYTHOLOGY),
-        (TRASH, TRASH),
+        (EVERYTHING, 'Everything'),
+        (SCIENCE, 'Science'),
+        (HISTORY, 'History'),
+        (LITERATURE, 'Literature'),
+        (PHILOSOPHY, 'Philosophy'),
+        (RELIGION, 'Religion'),
+        (GEOGRAPHY, 'Geography'),
+        (FINE_ARTS, 'Fine Arts'),
+        (SOCIAL_SCIENCE, 'Social Science'),
+        (MYTHOLOGY, 'Mythology'),
+        (TRASH, 'Trash'),
+    )
+
+    COLLEGE = "College"
+    HS = "HS"
+    MS = "MS"
+    difficulties = (
+        (COLLEGE, 'College'),
+        (MS, 'MS'),
+        (HS, 'HS'),
     )
 
     label = models.SlugField(unique=True)
@@ -62,6 +72,7 @@ class Room(models.Model):
     buzz_end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
 
     category = models.CharField(max_length=30, choices=categories, default=EVERYTHING)
+    difficulty = models.CharField(max_length=10, choices=difficulties, default=HS)
 
     def __str__(self):
         return self.label

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from channels import Group
 from channels.sessions import channel_session
 from .models import *
@@ -92,7 +93,7 @@ def ws_receive(message):
         # next question
         update_time_state(room)
         if room.state == 'idle':
-            questions = Question.objects.all() if room.category == 'Everything' else Question.objects.filter(category=room.category)
+            questions = Question.objects.filter(difficulty=room.difficulty) if room.category == 'Everything' else Question.objects.filter(Q(category=room.category) & Q(difficulty=room.difficulty))
             q = random.choice(questions)
 
             room.state = 'playing'
@@ -187,6 +188,19 @@ def ws_receive(message):
             room.save()
 
             create_message("set_category", f"The category is now <strong><i>{room.category}</i></strong>", room)
+            Group('game-'+label).send(get_response_json(room))
+        except ValidationError as e:
+            pass
+
+    elif(data['request_type'] == 'set_difficulty'):
+        try:
+            room.difficulty = clean_content(data['content'])
+            room.current_question = random.choice(Question.objects.all()) if room.current_question == None else room.current_question
+            room.buzz_player = room.players.first()
+            room.full_clean()
+            room.save()
+
+            create_message("set_difficulty", f"The difficulty is now <strong><i>{room.difficulty}</i></strong>", room)
             Group('game-'+label).send(get_response_json(room))
         except ValidationError as e:
             pass

@@ -47,6 +47,9 @@ $('#request-content').keypress(function(e) {
 $('#category-select').change(function(e) {
   set_category();
 });
+$('#difficulty-select').change(function(e) {
+  set_difficulty();
+});
 
 $('#buzz-btn').click(function(e) {
   buzz();
