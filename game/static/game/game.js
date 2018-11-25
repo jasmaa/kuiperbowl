@@ -158,6 +158,7 @@ gamesock.onmessage = function(message) {
 
     $('#category-header').html("Category: " + category);
     $('#category-select').val(data.room_category);
+    $('#difficulty-select').val(data.difficulty);
   }
   else if (data.response_type == "new_user") {
     setCookie('player_id', data.player_id);

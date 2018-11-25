@@ -250,6 +250,7 @@ def get_response_json(room):
         "room_category":room.category,
         "scores":room.get_scores(),
         "messages":room.get_messages(),
+        "difficulty":room.difficulty,
     })}
 
 def create_message(tag, content, room):
