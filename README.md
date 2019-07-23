@@ -15,7 +15,11 @@ Real-time multiplayer quizbowl. Functionally similar to Protobowl but significan
   - `python manage.py runserver`
 
 ### Production
+  - Make sure in `quizbowl/settings.py`
+    - `SECRET_KEY = <new secret key>`
+    - `DEBUG = False`
+	- `ALLOWED_HOSTS = [<hostnames>]`
   - `python manage.py collectstatic`
-  - Run `sudo daphne -p 8001 quizbowl.asgi:channel_layer` and `python manage.py runworkers` on separate screens
-  - Replace `/etc/nginx/nginx.conf` with the `nginx.conf` in this repo
+  - Run `sudo daphne -p 8001 quizbowl.asgi:channel_layer` and `python manage.py runworker` on separate screens
+  - Paste blocks from `nginx.conf` in this repo to `/etc/nginx/nginx.conf`
   
