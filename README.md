@@ -10,10 +10,11 @@ Real-time multiplayer quizbowl. Functionally similar to Protobowl but significan
 
 ## Run
 
-### Using built-in Django test server
+### Development
   - `python manage.py runserver`
 
-### Using Daphne
-  - `sudo daphne -p 8001 quizbowl.asgi:channel_layer`
-  - `python manage.py runworkers`
-  - Configure `nginx.conf` properly
+### Production
+  - `python manage.py collectstatic`
+  - Run `sudo daphne -p 8001 quizbowl.asgi:channel_layer` and `python manage.py runworkers` on separate screens
+  - Replace `/etc/nginx/nginx.conf` with the `nginx.conf` in this repo
+  

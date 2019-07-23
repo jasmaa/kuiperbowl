@@ -64,12 +64,12 @@ class Room(models.Model):
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
 
     current_question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='rooms', null=True)
-    start_time = models.FloatField(default=datetime.datetime.now().timestamp())
-    end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
+    start_time = models.FloatField(default=0)
+    end_time = models.FloatField(default=1)
 
     buzz_player = models.OneToOneField('Player', on_delete=models.CASCADE, null=True, related_name='buzz_player')
-    buzz_start_time = models.FloatField(default=datetime.datetime.now().timestamp())
-    buzz_end_time = models.FloatField(default=datetime.datetime.now().timestamp()+1)
+    buzz_start_time = models.FloatField(default=0)
+    buzz_end_time = models.FloatField(default=1)
 
     category = models.CharField(max_length=30, choices=categories, default=EVERYTHING)
     difficulty = models.CharField(max_length=10, choices=difficulties, default=HS)
@@ -100,7 +100,7 @@ class Player(models.Model):
     name = models.CharField(max_length=20)
     score = models.IntegerField()
     locked_out = models.BooleanField()
-    last_seen = models.FloatField(default=datetime.datetime.now().timestamp())
+    last_seen = models.FloatField(default=0)
 
     def __str__(self):
         return self.name + ":" + str(self.player_id)
