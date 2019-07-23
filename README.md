@@ -1,4 +1,5 @@
 # Kuiperbowl
+![Build badge](https://travis-ci.org/jasmaa/kuiperbowl.svg?branch=master)
 
 Real-time multiplayer quizbowl. Functionally similar to Protobowl but significantly worse.
 
