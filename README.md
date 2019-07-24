@@ -15,29 +15,10 @@ or custom made.
 
   - Creating Fixture Data
     - Load data from PB: `python scripts/pb_load.py`
+	- See `fixtures/sample.json` for an example custom fixture
   - Loading Data
     - Put fixture in `/fixtures`
 	- `python manage.py loaddata fixtures/<fixture name>`
-
-Sample fixture:
-
-```
-[
-  {
-    "model": "game.question",
-    "pk": 1,
-    "fields": {
-      "category": "Fine Arts",
-	  "difficulty": "HS",
-	  "points": 20,
-	  "content": "What do you call a ursine espresso drinker?"
-      "answer": "Coffee bear",
-	  "duration": 21.8
-    }
-  },
-  ...
-]
-```
 
 ## Run
 
