@@ -268,7 +268,7 @@ def create_new_user(room):
     m = hashlib.md5()
     m.update((room.label + str(datetime.datetime.now().timestamp())).encode("utf8"))
     player_id = int(m.hexdigest(), 16) % 1000000
-    p = Player(player_id=player_id, name=generate_name(), score=0, locked_out=False, room=room)
+    p = Player(player_id=player_id, name=generate_name(), room=room)
     p.save()
 
     return p

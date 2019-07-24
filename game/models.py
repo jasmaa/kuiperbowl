@@ -98,8 +98,8 @@ class Player(models.Model):
     player_id = models.PositiveIntegerField(primary_key=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='players')
     name = models.CharField(max_length=20)
-    score = models.IntegerField()
-    locked_out = models.BooleanField()
+    score = models.IntegerField(default=0)
+    locked_out = models.BooleanField(default=False)
     last_seen = models.FloatField(default=0)
 
     def __str__(self):

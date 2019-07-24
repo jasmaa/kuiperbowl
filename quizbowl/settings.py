@@ -76,7 +76,10 @@ ASGI_APPLICATION = 'quizbowl.routing.application'
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG":{'hosts':[('redis', 6379)]},
+        "CONFIG":{'hosts':[
+            #('localhost', 6379), # Use for local dev
+            ('redis', 6379), # Use for docker
+        ]},
         "ROUTING": "quizbowl.routing.channel_routing",
     },
 }
