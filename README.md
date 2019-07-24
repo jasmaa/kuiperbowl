@@ -1,5 +1,6 @@
 # Kuiperbowl
 ![Build badge](https://travis-ci.org/jasmaa/kuiperbowl.svg?branch=master)
+![Comet logo](https://github.com/jasmaa/kuiperbowl/blob/docker/game/static/game/comet.png)
 
 Real-time multiplayer quizbowl. Functionally similar to Protobowl but significantly worse.
 
@@ -26,17 +27,26 @@ Tossup questions can be loaded easily from a fixture. Data can be downloaded
 from the [Protobowl DB dumps repo](https://github.com/neotenic/database-dumps)
 or custom made. See `fixtures/sample.json` for an example custom fixture.
 
-  - Creating Fixture Data
-    - Load data from PB: `python scripts/pb_load.py`
-  - Loading Data
-    - Put fixture in `/fixtures`
-	- `python manage.py loaddata fixtures/<fixture name>`
+```
+# Load fixture data from PB db dump
+python scripts/pb_load.py
+python manage.py loaddata fixtures/pbdump.json
+```
 
-## Setup and Run with Docker
-  - `docker-compose up --build`
-  - `docker ps` and get container id for `kuiperbowl_web`
-  - Navigate to `<docker machine ip>:8000`
-  
-  - Loading Data
-    - `docker exec -t -i <container id> bash` to get shell
-	- `python manage.py loaddata <fixture path>`
+## Using Docker
+
+### Setup and Run
+```
+docker-compose up --build
+docker-machine ip
+# Site will be hosted at <docker machine ip>:8000`
+```
+
+### Loading Data
+```
+docker ps
+# Get container id of kuiperbowl_web
+
+docker exec -t -i <container id> bash
+python manage.py loaddata <fixture path>
+```
