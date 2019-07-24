@@ -25,7 +25,7 @@ SECRET_KEY = '+phm-vl*x5!l^az_3*+28q(*yv!*!d*ex-i(*r=e1oj=6rnxm1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -76,7 +76,7 @@ ASGI_APPLICATION = 'quizbowl.routing.application'
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG":{'hosts':[('localhost', 6379)]},
+        "CONFIG":{'hosts':[('redis', 6379)]},
         "ROUTING": "quizbowl.routing.channel_routing",
     },
 }
