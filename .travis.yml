@@ -1,4 +1,4 @@
-language: python
+sudo: required
 
 services:
   - docker
@@ -12,4 +12,5 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-script: docker-compose up
+script:
+  - docker-compose up --build
