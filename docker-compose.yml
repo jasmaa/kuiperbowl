@@ -12,9 +12,8 @@ services:
       - redis:redis
     volumes:
       - web-django:/usr/src/app
-    environment:
-      DEBUG: 'true'
-    command: /usr/local/bin/python manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
   redis:
     restart: always
@@ -24,6 +23,15 @@ services:
     volumes:
       - redisdata:/data
 
+  postgres:
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
 volumes:
   web-django:
   redisdata:
+  pgdata:

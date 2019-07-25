@@ -20,10 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+phm-vl*x5!l^az_3*+28q(*yv!*!d*ex-i(*r=e1oj=6rnxm1'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ['DEBUG'] == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -77,8 +77,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG":{'hosts':[
-            #('localhost', 6379), # Use for local dev
-            ('redis', 6379), # Use for docker
+            (os.getenv('REDIS_SERVICE', 'localhost'), int(os.getenv('REDIS_PORT', '6379'))),
         ]},
         "ROUTING": "quizbowl.routing.channel_routing",
     },
@@ -92,6 +91,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    #'default': {
+    #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #    'NAME': os.environ['DB_NAME'],
+    #    'USER': os.environ['DB_USER'],
+    #    'PASSWORD': os.environ['DB_PASS'],
+    #    'HOST': os.environ['DB_SERVICE'],
+    #    'PORT': int(os.getenv('DB_PORT', '5432')),
+    #}
 }
 
 
