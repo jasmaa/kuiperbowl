@@ -3,17 +3,16 @@ version: '3'
 services:
   web:
     restart: always
-    build: ./
+    build: ./web
     ports:
       - "8000:8000"
-    expose:
-      - "8000"
     links:
       - redis:redis
+      - postgres:postgres
     volumes:
       - web-django:/usr/src/app
     env_file: .env
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate; python manage.py loaddata fixtures/sample.json; python manage.py runserver 0.0.0.0:8000"
 
   redis:
     restart: always

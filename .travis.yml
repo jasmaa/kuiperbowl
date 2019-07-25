@@ -12,5 +12,9 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
+before_script:
+  - sudo service mysql stop
+  - sudo service postgresql stop
+
 script:
   - docker-compose up --build
