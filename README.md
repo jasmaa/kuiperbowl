@@ -1,8 +1,7 @@
 # Kuiperbowl
 ![Build badge](https://travis-ci.org/jasmaa/kuiperbowl.svg?branch=master)
 
-![Comet logo](./comet.svg)
-<img src="./comet.svg">
+![Comet logo](./comet.png)
 
 Real-time multiplayer quizbowl. Functionally similar to Protobowl but significantly worse.
 
