@@ -17,4 +17,4 @@ before_script:
   - sudo service postgresql stop
 
 script:
-  - docker-compose up --build
+  - docker-compose --build
