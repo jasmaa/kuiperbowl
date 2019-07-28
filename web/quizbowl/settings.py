@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+phm-vl*x5!l^az_3*+28q(*yv!*!d*ex-i(*r=e1oj=6rnxm1'
+SECRET_KEY = os.getenv('SECRET_KEY', '+phm-vl*x5!l^az_3*+28q(*yv!*!d*ex-i(*r=e1oj=6rnxm1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -76,7 +76,9 @@ ASGI_APPLICATION = 'quizbowl.routing.application'
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG":{'hosts':[('localhost', 6379)]},
+        "CONFIG":{'hosts':[
+            (os.getenv('REDIS_SERVICE', 'localhost'), int(os.getenv('REDIS_PORT', '6379'))),
+        ]},
         "ROUTING": "quizbowl.routing.channel_routing",
     },
 }
@@ -86,8 +88,12 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASS', 'postgres'),
+        'HOST': os.getenv('DB_SERVICE', 'localhost'),
+        'PORT': int(os.getenv('DB_PORT', '5432')),
     }
 }
 
