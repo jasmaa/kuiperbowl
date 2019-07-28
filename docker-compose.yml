@@ -5,36 +5,37 @@ services:
   nginx:
     restart: always
     build: ./nginx
+    volumes:
+      - web-static:/usr/src/app/static
     ports:
       - "80:80"
-    volumes:
-      - web-static:/www/static
     links:
       - web:web
 
   web:
     restart: always
     build: ./web
-    ports:
-      - "8000:8000"
     expose:
       - 8000
     links:
       - redis:redis
       - postgres:postgres
     volumes:
-      - web-django:/usr/src/app
+      - web-static:/usr/src/app/static
     env_file: .env
     command: bash -c "
+      cd /usr/src/app &&
+      python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
-      python manage.py loaddata fixtures/sample.json &&
       daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:channel_layer"
 
   worker:
     restart: always
     build: ./web
     env_file: .env
-    command: bash -c "python manage.py runworker"
+    command: bash -c "
+      cd /usr/src/app &&
+      python manage.py runworker"
 
   redis:
     restart: always
@@ -53,7 +54,6 @@ services:
       - pgdata:/var/lib/postgresql/data/
 
 volumes:
-  web-django:
   web-static:
   redisdata:
   pgdata:
