@@ -1,8 +1,11 @@
-FROM python:3.6
+FROM python:3.6-alpine
 
-RUN python -m pip install --upgrade pip
+RUN apk update
+RUN apk add postgresql-dev gcc python3-dev musl-dev libffi-dev bash
+
+RUN python3 -m pip install --upgrade pip
 
 COPY requirements.txt requirements.txt
-RUN python -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 COPY . /usr/src/app

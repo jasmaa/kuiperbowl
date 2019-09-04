@@ -33,9 +33,7 @@ services:
     restart: always
     build: ./web
     env_file: .env
-    command: bash -c "
-      cd /usr/src/app &&
-      python manage.py runworker"
+    command: bash -c "cd /usr/src/app && python manage.py runworker"
 
   redis:
     restart: always
