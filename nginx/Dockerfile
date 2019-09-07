@@ -2,6 +2,12 @@ FROM nginx:1.12-alpine
 
 RUN apk update && apk add openssl
 
+# Cron to restart server
+COPY restart-cron /etc/cron.d/restart-cron
+RUN chmod 0644 /etc/cron.d/restart-cron
+RUN crontab /etc/cron.d/restart-cron
+CMD crond && nginx -g 'daemon off;'
+
 # Create dummy cert
 RUN mkdir /etc/letsencrypt
 RUN mkdir /etc/letsencrypt/live
