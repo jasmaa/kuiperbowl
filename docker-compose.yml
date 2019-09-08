@@ -6,20 +6,10 @@ services:
     build: ./nginx
     volumes:
       - web-static:/usr/src/app/static
-      - certdata:/etc/letsencrypt/live
-      - cert-webroot:/var/www/certbot
     ports:
       - "80:80"
-      - "443:443"
     links:
       - web:web
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certdata:/etc/letsencrypt/live
-      - cert-webroot:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --register-unsafely-without-email --agree-tos -d kuiperbowl.com -d www.kuiperbowl.com
 
   web:
     build: ./web
@@ -60,5 +50,3 @@ volumes:
   web-static:
   redisdata:
   pgdata:
-  certdata:
-  cert-webroot:
