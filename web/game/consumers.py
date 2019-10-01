@@ -129,7 +129,7 @@ def ws_receive(message):
 
         p = room.players.get(player_id=data['player_id'])
 
-        if not p.locked_out and room.state == 'contest':
+        if p.player_id == room.buzz_player.player_id and room.state == 'contest':
             # fuzzy eval
             cleaned_content = clean_content(data['content'])
             ratio = fuzz.partial_ratio(cleaned_content, room.current_question.answer)
