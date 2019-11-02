@@ -1,5 +1,5 @@
 channels==1.1.7
-django==1.10.7
+django==1.11.23
 asgi-redis==1.4.3
 fuzzywuzzy==0.17.0
 python-Levenshtein==0.12.0
