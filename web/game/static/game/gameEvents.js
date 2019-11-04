@@ -1,3 +1,4 @@
+
 // Events in game
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();

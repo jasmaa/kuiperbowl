@@ -1,8 +1,12 @@
-from channels.routing import route
-from game.consumers import *
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import game.routing
 
-channel_routing = [
-    route('websocket.connect', ws_connect),
-    route("websocket.receive", ws_receive),
-    route('websocket.disconnect', ws_disconnect),
-]
+application = ProtocolTypeRouter({
+    # (http->django views is added by default)
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            game.routing.websocket_urlpatterns
+        )
+    ),
+})
