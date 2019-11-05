@@ -1,5 +1,5 @@
 var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-var gamesock = new WebSocket(ws_scheme + '://' + window.location.host + window.location.pathname);
+var gamesock = new WebSocket(ws_scheme + '://' + window.location.host + window.location.pathname); //changed
 
 var player_name;
 var player_id;
@@ -107,9 +107,10 @@ function update() {
 
 // Handle server response
 gamesock.onmessage = function(message) {
-  console.log(message);
 
   var data = JSON.parse(message.data);
+
+  console.log(data);
 
   if (data.response_type == "update") {
     // sync client with server

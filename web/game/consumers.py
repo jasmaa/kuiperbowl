@@ -40,25 +40,39 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        data = text_data_json['content']
+        data = json.loads(text_data)
+
+        await self.send_json(data)
+
         room = Room.objects.get(label=self.room_name)
 
-        if text_data_json['request_type'] == 'ping':
+        if data['request_type'] == 'ping':
             await self.ping(room, data)
+        elif data['request_type'] == 'join':
+            await self.join(room, data)
+        elif data['request_type'] == 'leave':
+            await self.join(room)
+        elif data['request_type'] == 'get_answer':
+            await self.get_answer(room, data)
         else:
             pass
 
+    async def update_room(self, event):
+        """Room update handler
+        """
+        await self.send_json(event['data'])
+
 
     async def ping(self, room, data):
-        # update ping
+        """Receives ping
+        """
         try:
             p = room.players.get(player_id=data['player_id'])
             p.last_seen = datetime.datetime.now().timestamp()
             p.save()
 
             update_time_state(room)
-                
+                    
             await self.send_json(get_response_json(room))
 
         except Exception as e:
@@ -69,49 +83,62 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 "player_id": p.player_id,
                  "player_name": p.name,
             })
-
             create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
 
-            await self.group_send(self.room_group_name, get_response_json(room))
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'update_room',
+                    'data': get_response_json(room),
+                }
+            )
 
 
+    async def join(self, room, data):
+        """Join room
         """
-        # get message
-        room = Room.objects.get(label=self.room_name)
-        data = json.loads(message['text'])
+        p = room.players.get(player_id=data['player_id'])
+        create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'update_room',
+                'data': get_response_json(room),
+            }
+        )
 
-        # determine request type
-        if(data['request_type'] == 'ping'):
-            # update ping
-            try:
-                p = room.players.get(player_id=data['player_id'])
-                p.last_seen = datetime.datetime.now().timestamp()
-                p.save()
 
-                update_time_state(room)
-                message.reply_channel.send(get_response_json(room))
-            except Exception as e:
-                p = create_new_user(room)
+    async def leave(self, room):
+        """Leave room
+        """
+        p = room.players.get(player_id=data['player_id'])
+        create_message("leave", f"<strong>{p.name}</strong> has left the room", room)
+        await self.channel_layer.group_send(self.room_group_name, get_response_json(room))
 
-                message.reply_channel.send({'text':json.dumps({
-                    "response_type":"new_user",
-                    "player_id":p.player_id,
-                    "player_name":p.name,
-                })})
 
-                create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
-                Group('game-'+label).send(get_response_json(room))
+    async def get_answer(self, room, data):
+        update_time_state(room)
+        if room.state == 'idle':
+            # generate random question for now if empty
+            if room.current_question == None:
+                questions = Question.objects.all()
+                q = random.choice(questions)
+                room.current_question = q
+                room.save()
+            
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'update_room',
+                    'data': {
+                        "response_type": "send_answer",
+                        "answer": room.current_question.answer,
+                    },
+                }
+            )
 
-        elif(data['request_type'] == 'join'):
-                p = room.players.get(player_id=data['player_id'])
-                create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
-                Group('game-'+label).send(get_response_json(room))
 
-        elif(data['request_type'] == 'leave'):
-            p = room.players.get(player_id=data['player_id'])
-            create_message("leave", f"<strong>{p.name}</strong> has left the room", room)
-            Group('game-'+label).send(get_response_json(room))
-
+        """ 
         elif(data['request_type'] == 'new_user'):
             # new user
             p = create_new_user(room)
