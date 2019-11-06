@@ -52,7 +52,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         elif data['request_type'] == 'join':
             await self.join(room, data)
         elif data['request_type'] == 'leave':
-            await self.join(room)
+            await self.leave(room, data)
         elif data['request_type'] == 'get_answer':
             await self.get_answer(room, data)
         elif data['request_type'] == 'new_user':
@@ -110,12 +110,18 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def leave(self, room):
+    async def leave(self, room, data):
         """Leave room
         """
         p = room.players.get(player_id=data['player_id'])
         create_message("leave", f"<strong>{p.name}</strong> has left the room", room)
-        await self.channel_layer.group_send(self.room_group_name, get_response_json(room))
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'update_room',
+                'data': get_response_json(room),
+            }
+        )
 
     async def new_user(self, room):
         """Create new player

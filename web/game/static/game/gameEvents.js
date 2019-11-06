@@ -26,7 +26,7 @@ window.setTimeout(setup, 600);
 window.setInterval(ping, 5000);
 window.setInterval(update, 100);
 
-window.onunload = leave;
+window.onbeforeunload = leave;
 
 name.oninput = set_name;
 
