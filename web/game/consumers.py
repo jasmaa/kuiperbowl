@@ -2,10 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-
-#from channels import Group
-#from channels.sessions import channel_session
-
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .models import *
@@ -365,20 +361,20 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    
 
 # === Helper methods ===
 
 def update_time_state(room):
-    """Checks time and updates state"""
+    """Checks time and updates state
+    """
     if not room.state == 'contest':
         if datetime.datetime.now().timestamp() >= room.end_time:
             room.state = 'idle'
             room.save()
 
 def get_response_json(room):
-    """Generates json for update response"""
-
+    """Generates json for update response
+    """
     return {
         "response_type":"update",
         "game_state":room.state,
@@ -395,7 +391,8 @@ def get_response_json(room):
     }
 
 def create_message(tag, content, room):
-    """Adds a message to db"""
+    """Adds a message to db
+    """
     try:
         m = Message(content=content, room=room, tag=tag)
         m.full_clean()
@@ -404,7 +401,8 @@ def create_message(tag, content, room):
         return
 
 def create_new_user(room):
-    """Generates new user"""
+    """Generates new user
+    """
     # generate new id
     m = hashlib.md5()
     m.update((room.label + str(datetime.datetime.now().timestamp())).encode("utf8"))

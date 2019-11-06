@@ -1,26 +1,42 @@
 
-
+/**
+ * Get user data from cookie
+ */
 function retrieve_userdata(){
-  var prefs = cookieToDict(document.cookie);
+  const prefs = cookieToDict(document.cookie);
   player_name = prefs['player_name'];
   player_id = prefs['player_id'];
   locked_out = prefs['locked_out'] === 'true';
 }
 
+/**
+ * Set cookie
+ * @param {*} name 
+ * @param {*} val 
+ */
 function setCookie(name, val){
-  document.cookie = name+"="+val;
+  document.cookie = `${name}=${val}`;
 }
 
+/**
+ * Set cookie and path
+ * @param {*} name 
+ * @param {*} val 
+ * @param {*} path 
+ */
 function setCookieAndPath(name, val, path){
-  document.cookie = name+"="+val+"; path="+path;
+  document.cookie = `${name}=${val}; path=${path}`;
 }
 
-// I stole this
+/**
+ * Extract object from cookie
+ * @param {*} str 
+ */
 function cookieToDict(str) {
     str = str.split('; ');
-    var result = {};
-    for (var i = 0; i < str.length; i++) {
-        var cur = str[i].split('=');
+    let result = {};
+    for (let i = 0; i < str.length; i++) {
+        const cur = str[i].split('=');
         result[cur[0]] = cur[1];
     }
     return result;

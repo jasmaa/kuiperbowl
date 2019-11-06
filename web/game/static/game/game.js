@@ -1,26 +1,26 @@
-var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-var gamesock = new WebSocket(ws_scheme + '://' + window.location.host + window.location.pathname);
+const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + window.location.pathname);
 
-var player_name;
-var player_id;
-var locked_out;
+let player_name;
+let player_id;
+let locked_out;
 
-var game_state = 'idle';
-var current_action = 'idle';
+let game_state = 'idle';
+let current_action = 'idle';
 
-var current_time;
-var start_time;
-var end_time;
-var buzz_start_time;
-var buzz_passed_time = 0;
-var grace_time = 3;
-var buzz_time = 8;
+let current_time;
+let start_time;
+let end_time;
+let buzz_start_time;
+let buzz_passed_time = 0;
+let grace_time = 3;
+let buzz_time = 8;
 
-var question;
-var category;
-var curr_question_content;
-var scores;
-var messages;
+let question;
+let category;
+let curr_question_content;
+let scores;
+let messages;
 
 // Set up client
 function setup() {
@@ -29,13 +29,13 @@ function setup() {
   if (player_id == undefined) {
     new_user();
   }
-  else{
+  else {
     ping();
     join();
   }
 
-  $('#name').val(player_name);
-  $('#request-content').hide();
+  nameInput.value = player_name;
+  requestContentInput.style.display = 'none';
 
   // set up current time if newly joined
   current_time = buzz_start_time;
@@ -47,18 +47,15 @@ function update() {
     return;
   }
 
-  var time_passed = current_time - start_time;
-  var duration = end_time - start_time;
+  let time_passed = current_time - start_time;
+  let duration = end_time - start_time;
 
   // Update if game is going
-  var buzz_progress = $('#buzz-progress');
-  buzz_progress.css('width', Math.round(100 * (1.1 * buzz_passed_time / buzz_time)) + '%');
-  var content_progress = $('#content-progress');
-  content_progress.css('width', Math.round(100 * (1.05 * time_passed / duration)) + '%');
-  var question_body = $('#question-space');
-  question_body.html(curr_question_content);
+  buzzProgress.style.width = Math.round(100 * (1.1 * buzz_passed_time / buzz_time)) + '%';
+  contentProgress.style.width = Math.round(100 * (1.05 * time_passed / duration)) + '%';
+  questionSpace.innerHTML = curr_question_content;
 
-  if(game_state == 'idle'){
+  if (game_state == 'idle') {
 
     locked_out = false;
     setCookie('locked_out', locked_out);
@@ -67,29 +64,32 @@ function update() {
       get_answer();
     }
 
-    var content_progress = $('#content-progress');
-    content_progress.css('width', '0%');
-
-    var question_space = $('#question-space');
-    question_space.html(question);
+    contentProgress.style.width = '0%';
+    questionSpace.innerHTML = question;
   }
 
   else if (game_state == 'playing') {
     buzz_passed_time = 0;
-    curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration - grace_time))))
+    curr_question_content = question.substring(
+      0,
+      Math.round(question.length * (time_passed / (duration - grace_time)))
+    );
     current_time += 0.1;
 
-    $('#content-progress').show();
-    $('#buzz-progress').hide();
-    $('#answer-header').html("");
+    contentProgress.style.display = '';
+    buzzProgress.style.display = 'none';
+    answerHeader.innerHTML = '';
   }
 
   else if (game_state == 'contest') {
     time_passed = buzz_start_time - start_time;
-    curr_question_content = question.substring(0, Math.round(question.length * (time_passed / (duration - grace_time))))
+    curr_question_content = question.substring(
+      0,
+      Math.round(question.length * (time_passed / (duration - grace_time)))
+    );
 
-    $('#content-progress').hide();
-    $('#buzz-progress').show();
+    contentProgress.style.display = 'none';
+    buzzProgress.style.display = '';
 
     // auto answer if over buzz time
     if (buzz_passed_time >= buzz_time) {
@@ -106,11 +106,9 @@ function update() {
 }
 
 // Handle server response
-gamesock.onmessage = function(message) {
+gamesock.onmessage = function (message) {
 
-  var data = JSON.parse(message.data);
-
-  console.log(data);
+  const data = JSON.parse(message.data);
 
   if (data.response_type == "update") {
     // sync client with server
@@ -125,43 +123,78 @@ gamesock.onmessage = function(message) {
     messages = data.messages
 
     // update ui
-    var scoreboard = $('#scoreboard-body');
-    scoreboard.html("")
+    scoreboard.innerHTML = '';
     for (i = 0; i < scores.length; i++) {
-      var icon = '<i class="fas fa-circle" style="color:#aaaaaa;"></i>&nbsp'
-      if(scores[i][2]){
-        icon = '<i class="fas fa-circle" style="color:#00ff00;"></i>&nbsp'
+      const icon = document.createElement('i');
+      icon.classList.add('fas');
+      icon.classList.add('fa-circle');
+      icon.style.margin = '0.5em';
+      if (scores[i][2]) {
+        icon.style.color = '#00ff00';
       }
-      scoreboard.append("<tr><td>" + icon + scores[i][0] + "</td><td>" + scores[i][1] + "</td></tr>")
+      else {
+        icon.style.color = '#aaaaaa';
+      }
+      const row = scoreboard.insertRow(icon);
+      const cell1 = row.insertCell();
+      cell1.append(icon);
+      cell1.append(scores[i][0]);
+      const cell2 = row.insertCell();
+      cell2.append(scores[i][1])
     }
 
-    var message_space = $('#message-space');
-    message_space.html("")
+    messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
-      var tag = messages[i][0]
-      var icon = '<i class="far fa-circle" style="opacity: 0;"></i>&nbsp';
-      if(tag == "buzz_correct"){
-        icon = '<i class="far fa-circle" style="color:#00cc00;"></i>&nbsp';
+      const tag = messages[i][0]
+      const icon = document.createElement('i');
+
+      icon.style.margin = '0.5em';
+      if (tag == "buzz_correct") {
+        icon.classList.add('far');
+        icon.classList.add('fa-circle');
+        icon.style.color = '#00cc00';
       }
-      else if(tag == "buzz_wrong"){
-        icon = '<i class="far fa-circle" style="color:#cc0000;"></i>&nbsp';
+      else if (tag == "buzz_wrong") {
+        icon.classList.add('far');
+        icon.classList.add('fa-circle');
+        icon.style.color = '#cc0000';
       }
-      else if(tag == "chat"){
-        icon = '<i class="far fa-comment-alt" style="color:#aaaaaa;"></i>&nbsp';
+      else if (tag == "chat") {
+        icon.classList.add('far');
+        icon.classList.add('fa-comment-alt');
+        icon.style.color = '#aaaaaa';
       }
-      else if(tag == "leave"){
-        icon = '<i class="fas fa-door-open" style="color:#99bbff;"></i>&nbsp';
+      else if (tag == "leave") {
+        icon.classList.add('fas');
+        icon.classList.add('fa-door-open');
+        icon.style.color = '#99bbff';
       }
-      else if(tag == "join"){
-        icon = '<i class="fas fa-sign-in-alt" style="color:#99bbff;"></i>&nbsp';
+      else if (tag == "join") {
+        icon.classList.add('fas');
+        icon.classList.add('fa-sign-in-alt');
+        icon.style.color = '#99bbff';
+      }
+      else {
+        icon.classList.add('far');
+        icon.classList.add('fa-circle');
+        icon.style.opacity = 0;
       }
 
-      message_space.append('<li class="list-group-item">'+icon+messages[i][1]+'</li>');
+      const li = document.createElement('li');
+      li.classList.add('list-group-item');
+      li.style.display = 'flex';
+      li.style.flexDirection = 'row';
+      li.style.alignItems = 'center';
+      li.append(icon);
+      const msg = document.createElement('div');
+      msg.innerHTML = messages[i][1];
+      li.append(msg);
+      messageSpace.append(li);
     }
 
-    $('#category-header').html("Category: " + category);
-    $('#category-select').val(data.room_category);
-    $('#difficulty-select').val(data.difficulty);
+    categoryHeader.innerHTML = `Category ${category}`;
+    categorySelect.value = data.room_category;
+    difficultySelect.value = data.difficulty;
   }
   else if (data.response_type == "new_user") {
     setCookie('player_id', data.player_id);
@@ -171,13 +204,13 @@ gamesock.onmessage = function(message) {
     locked_out = false;
 
     // Update name
-    $('#name').val(player_name);
+    name.value = player_name;
     ping();
   }
   else if (data.response_type == "send_answer") {
-    $('#answer-header').html("Answer: " + data.answer);
+    answerHeader.innerHTML = `Answer: ${data.answer}`;
   }
-  else if(data.response_type == "lock_out"){
+  else if (data.response_type == "lock_out") {
     locked_out = true;
     setCookie('locked_out', locked_out);
   }
@@ -185,51 +218,46 @@ gamesock.onmessage = function(message) {
 
 // Ping server for state
 function ping() {
-  var message = {
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "ping",
     content: ""
-  }
-  gamesock.send(JSON.stringify(message));
+  }));
 }
 
 function join() {
-  var message = {
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "join",
     content: ""
-  }
-  gamesock.send(JSON.stringify(message));
+  }));
 }
 
 function leave() {
-  var message = {
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "leave",
     content: ""
-  }
-  gamesock.send(JSON.stringify(message));
+  }));
 }
 
 // Request new user
 function new_user() {
-  var message = {
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "new_user",
     content: ""
-  }
-  gamesock.send(JSON.stringify(message));
+  }));
 }
 
 // Request change name
 function set_name() {
-  setCookie('player_name', $('#name').val());
-  var message = {
+  setCookie('player_name', name.value);
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "set_name",
-    content: $('#name').val()
-  }
-  gamesock.send(JSON.stringify(message));
+    content: name.value,
+  }));
 }
 
 // Buzz
@@ -237,24 +265,23 @@ function buzz() {
   if (!locked_out && game_state == 'playing') {
     current_action = 'buzz';
 
-    $('#request-content').val('');
-    $('#request-content').show();
+    requestContentInput.value = '';
+    requestContentInput.style.display = '';
     buzz_passed_time = 0;
 
-    $('#next-btn').hide();
-    $('#buzz-btn').hide();
-    $('#chat-btn').hide();
+    nextBtn.style.display = 'none';
+    buzzBtn.style.display = 'none';
+    chatBtn.style.display = 'none';
 
     game_state = 'contest';
-    var message = {
+    gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "buzz_init",
       content: ""
-    }
-    gamesock.send(JSON.stringify(message));
+    }));
 
-    setTimeout(function(){
-      $('#request-content').focus();
+    setTimeout(function () {
+      requestContentInput.focus();
     }, 1);
   }
 }
@@ -264,38 +291,37 @@ function chat_init() {
   if (current_action != 'buzz') {
     current_action = 'chat';
 
-    $('#request-content').val('');
-    $('#request-content').show();
+    requestContentInput.value = '';
+    requestContentInput.style.display = '';
 
-    $('#next-btn').hide();
-    $('#buzz-btn').hide();
-    $('#chat-btn').hide();
+    nextBtn.style.display = 'none';
+    buzzBtn.style.display = 'none';
+    chatBtn.style.display = 'none';
 
-    setTimeout(function(){
-      $('#request-content').focus();
+    setTimeout(function () {
+      requestContentInput.focus();
     }, 1);
   }
 }
 
-function send_chat(){
+function send_chat() {
   if (current_action == 'chat') {
 
-    $('#next-btn').show();
-    $('#buzz-btn').show();
-    $('#chat-btn').show();
-    $('#request-content').hide();
+    nextBtn.style.display = '';
+    buzzBtn.style.display = '';
+    chatBtn.style.display = '';
+    requestContentInput.style.display = 'none';
     current_action = 'idle';
 
-    if($('#request-content').val() == ""){
+    if ($('#request-content').val() == "") {
       return;
     }
 
-    var message = {
+    gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "chat",
-      content: $('#request-content').val()
-    }
-    gamesock.send(JSON.stringify(message));
+      content: requestContentInput.value,
+    }));
   }
 }
 
@@ -303,70 +329,63 @@ function send_chat(){
 function answer() {
   if (game_state == 'contest') {
 
-    $('#next-btn').show();
-    $('#buzz-btn').show();
-    $('#chat-btn').show();
-    $('#request-content').hide();
+    nextBtn.style.display = '';
+    buzzBtn.style.display = '';
+    chatBtn.style.display = '';
+    requestContentInput.style.display = 'none';
     game_state = 'playing';
     current_action = 'idle';
 
-    var message = {
+    gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "buzz_answer",
-      content: $('#request-content').val()
-    }
-    gamesock.send(JSON.stringify(message));
+      content: requestContentInput.value,
+    }));
   }
 }
 
 // Request next question
 function next() {
   if (game_state == 'idle') {
-    var question_body = $('#question-space');
-    question_body.html("");
+    questionSpace.innerHTML = '';
 
-    var message = {
+    gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "next",
       content: ""
-    }
-    gamesock.send(JSON.stringify(message));
+    }));
   }
 }
 
 // Request answer
 function get_answer() {
   if (game_state == 'idle') {
-    var message = {
+    gamesock.send(JSON.stringify({
       request_type: "get_answer",
-    }
-    gamesock.send(JSON.stringify(message));
+    }));
   }
 }
 
 // Set category
-function set_category(){
-  var message = {
+function set_category() {
+  gamesock.send(JSON.stringify({
     request_type: "set_category",
-    content: $('#category-select').val()
-  }
-  gamesock.send(JSON.stringify(message));
+    content: categorySelect.value,
+  }));
 }
 
 // Set difficulty
-function set_difficulty(){
-  var message = {
+function set_difficulty() {
+  gamesock.send(JSON.stringify({
     request_type: "set_difficulty",
-    content: $('#difficulty-select').val()
-  }
-  gamesock.send(JSON.stringify(message));
+    content: difficultySelect.value,
+  }));
 }
 
 // resets score
-function reset_score(){
-  var message = {
+function reset_score() {
+  gamesock.send(JSON.stringify({
     player_id: player_id,
     request_type: "reset_score",
-  }
-  gamesock.send(JSON.stringify(message));
+  }));
 }
