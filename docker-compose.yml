@@ -25,12 +25,7 @@ services:
       cd /usr/src/app &&
       python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
-      daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:channel_layer"
-
-  worker:
-    build: ./web
-    env_file: .env
-    command: bash -c "cd /usr/src/app && python manage.py runworker"
+      daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:application"
 
   redis:
     image: redis:latest
