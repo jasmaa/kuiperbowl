@@ -1,5 +1,5 @@
 const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + window.location.pathname);
+const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + '/ws' + window.location.pathname);
 
 let player_name;
 let player_id;
@@ -24,6 +24,9 @@ let messages;
 
 // Set up client
 function setup() {
+  
+  requestContentInput.style.display = 'none';
+
   // set up user
   retrieve_userdata();
   if (player_id == undefined) {
@@ -35,7 +38,6 @@ function setup() {
   }
 
   nameInput.value = player_name;
-  requestContentInput.style.display = 'none';
 
   // set up current time if newly joined
   current_time = buzz_start_time;

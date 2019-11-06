@@ -16,12 +16,12 @@ const buzzBtn = document.getElementById('buzz-btn');
 const chatBtn = document.getElementById('chat-btn');
 const resetBtn = document.getElementById('reset-btn');
 
-// Events in game
+// Init tooltips
 $(document).ready(function () {
   $('[data-toggle="tooltip"]').tooltip();
 });
 
-// timed events
+// Timed events
 window.setTimeout(setup, 600);
 window.setInterval(ping, 5000);
 window.setInterval(update, 100);
