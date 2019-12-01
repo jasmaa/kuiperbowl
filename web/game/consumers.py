@@ -219,6 +219,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
     async def buzz_answer(self, room, data):
         p = room.players.get(player_id=data['player_id'])
 
+        if data['content'] == None:
+            data['content'] = ""
+
         if p.player_id == room.buzz_player.player_id and room.state == 'contest':
             # fuzzy eval
             cleaned_content = clean_content(data['content'])
