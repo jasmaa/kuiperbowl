@@ -6,12 +6,12 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .models import *
 from .utils import *
+from .judge import *
 
 import json
 import datetime
 import hashlib
 import random
-from fuzzywuzzy import fuzz
 
 GRACE_TIME = 3
 
@@ -223,11 +223,10 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             data['content'] = ""
 
         if p.player_id == room.buzz_player.player_id and room.state == 'contest':
-            # fuzzy eval
+            
             cleaned_content = clean_content(data['content'])
-            ratio = fuzz.partial_ratio(cleaned_content, room.current_question.answer)
-
-            if cleaned_content != "" and ratio >= 60:
+            
+            if judge_answer(cleaned_content, room.current_question.answer):
                 p.score += room.current_question.points
                 p.save()
 
