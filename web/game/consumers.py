@@ -257,19 +257,20 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                     "response_type":"lock_out",
                 })
 
-            buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
-            room.state = 'playing'
-            room.start_time += buzz_duration
-            room.end_time += buzz_duration
-            room.save()
+        # resume playing
+        buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+        room.state = 'playing'
+        room.start_time += buzz_duration
+        room.end_time += buzz_duration
+        room.save()
 
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'update_room',
-                    'data': get_response_json(room),
-                }
-            )
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'update_room',
+                 'data': get_response_json(room),
+            }
+        )
 
     async def get_answer(self, room, data):
         """Get answer for room question
