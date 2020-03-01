@@ -93,6 +93,10 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             update_time_state(room)
                     
             await self.send_json(get_response_json(room))
+            await self.send_json({
+                'response_type': 'lock_out',
+                'locked_out': p.locked_out,
+            })
 
         except Exception as e:
             await self.new_user(room)
@@ -102,6 +106,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         p = room.players.get(player_id=data['player_id'])
         create_message("join", f"<strong>{p.name}</strong> has joined the room", room)
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -207,6 +212,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             room.buzz_start_time = datetime.datetime.now().timestamp()
             room.save()
 
+            p.locked_out = True
+            p.save()
+
             create_message("buzz_init", f"<strong>{p.name}</strong> has buzzed", room)
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -242,9 +250,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             else:
                 # question reading ended, do penalty
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
-                    p.score -= 10
-                p.locked_out = True
-                p.save()
+                    room.buzz_player.score -= 10
+                    room.buzz_player.save()
 
                 create_message(
                     "buzz_wrong",
@@ -254,22 +261,44 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
                 await self.send_json({
                     "response_type":"lock_out",
+                    "locked_out": True,
                 })
 
-        # resume playing
-        buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
-        room.state = 'playing'
-        room.start_time += buzz_duration
-        room.end_time += buzz_duration
-        room.save()
+            buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+            room.state = 'playing'
+            room.start_time += buzz_duration
+            room.end_time += buzz_duration
+            room.save()
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'update_room',
-                 'data': get_response_json(room),
-            }
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'update_room',
+                    'data': get_response_json(room),
+                }
+            )
+        
+        # resume if time up
+        elif datetime.datetime.now().timestamp() >=  room.buzz_start_time + GRACE_TIME and room.state == 'contest':
+            buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+            room.state = 'playing'
+            room.start_time += buzz_duration
+            room.end_time += buzz_duration
+            room.save()
+
+            create_message(
+                "buzz_wrong",
+                f"<strong>{room.buzz_player.name}</strong> forfeit the question",
+                room
+            )
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'update_room',
+                    'data': get_response_json(room),
+                }
+            )
 
     async def get_answer(self, room, data):
         """Get answer for room question

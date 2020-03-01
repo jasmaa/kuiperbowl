@@ -63,7 +63,6 @@ function update() {
   if (game_state == 'idle') {
 
     locked_out = false;
-    setCookie('locked_out', locked_out);
 
     if ($('#answer-header').html() == "") {
       get_answer();
@@ -216,8 +215,7 @@ gamesock.onmessage = function (message) {
     answerHeader.innerHTML = `Answer: ${data.answer}`;
   }
   else if (data.response_type == "lock_out") {
-    locked_out = true;
-    setCookie('locked_out', locked_out);
+    locked_out = data.locked_out;
   }
 }
 
