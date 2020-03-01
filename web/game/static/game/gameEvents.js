@@ -1,3 +1,5 @@
+// gameEvents.js
+// Listeners for events during game
 
 const nameInput = document.getElementById('name');
 const requestContentInput = document.getElementById('request-content');

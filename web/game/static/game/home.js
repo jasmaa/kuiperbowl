@@ -1,16 +1,34 @@
-function gotoRoom(){
-  var loc = $('#landing-content').val().trim();
-  if(loc == ""){
-    loc = 'hs';
+// home.js
+// Scripts for landing page
+
+const landingContent = document.getElementById('landing-content');
+const landingForm = document.getElementById('landing-form');
+
+landingForm.onsubmit = (e) => {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const loc = landingContent.value.trim();
+  
+  if (loc != '' && loc.match(/^[a-z0-9_-]+$/)) {
+    window.location.href = "/game/" + loc;
   }
-  window.location.href = "/game/"+loc;
+  else {
+    landingContent.classList.add('is-invalid');
+  }
 }
 
-$('#landing-btn').click(function(e) {
+/*
+landingBtn.onclick = (e) => {
   gotoRoom();
-});
-$('#landing-content').keypress(function(e) {
-  if(e.which == 13){
-    gotoRoom();
+}
+
+landingContent.onkeypress = (e) => {
+  if (e.which == 13) {
+    //gotoRoom();
+    e.preventDefault();
+    e.stopPropagation();
   }
-});
+}
+*/

@@ -1,3 +1,6 @@
+// game.js
+// Plays client-side game
+
 const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + '/ws' + window.location.pathname);
 
@@ -24,7 +27,7 @@ let messages;
 
 // Set up client
 function setup() {
-  
+
   requestContentInput.style.display = 'none';
 
   // set up user
