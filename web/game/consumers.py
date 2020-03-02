@@ -225,12 +225,17 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def buzz_answer(self, room, data):
+
+        # Reject non-contest messages
+        if room.state != 'contest':
+            return
+
         p = room.players.get(player_id=data['player_id'])
 
         if data['content'] == None:
             data['content'] = ""
 
-        if p.player_id == room.buzz_player.player_id and room.state == 'contest':
+        if p.player_id == room.buzz_player.player_id:
             
             cleaned_content = clean_content(data['content'])
             
@@ -279,7 +284,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             )
         
         # resume if time up
-        elif datetime.datetime.now().timestamp() >=  room.buzz_start_time + GRACE_TIME and room.state == 'contest':
+        elif datetime.datetime.now().timestamp() >=  room.buzz_start_time + GRACE_TIME:
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'
             room.start_time += buzz_duration

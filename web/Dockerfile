@@ -5,7 +5,9 @@ RUN apk add postgresql-dev gcc python3-dev musl-dev libffi-dev bash
 
 RUN python3 -m pip install --upgrade pip
 
+WORKDIR /usr/src/app
+
 COPY requirements.txt requirements.txt
 RUN python3 -m pip install -r requirements.txt
 
-COPY . /usr/src/app
+COPY . .

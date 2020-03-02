@@ -22,7 +22,6 @@ services:
       - web-static:/usr/src/app/static
     env_file: .env
     command: bash -c "
-      cd /usr/src/app &&
       python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
       daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:application"
