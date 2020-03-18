@@ -1,16 +1,20 @@
-function gotoRoom(){
-  var loc = $('#landing-content').val().trim();
-  if(loc == ""){
-    loc = 'hs';
-  }
-  window.location.href = "/game/"+loc;
-}
+// home.js
+// Scripts for landing page
 
-$('#landing-btn').click(function(e) {
-  gotoRoom();
-});
-$('#landing-content').keypress(function(e) {
-  if(e.which == 13){
-    gotoRoom();
+const landingContent = document.getElementById('landing-content');
+const landingForm = document.getElementById('landing-form');
+
+landingForm.onsubmit = (e) => {
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const loc = landingContent.value.trim();
+  
+  if (loc != '' && loc.match(/^[a-z0-9_-]+$/)) {
+    window.location.href = "/game/" + loc;
   }
-});
+  else {
+    landingContent.classList.add('is-invalid');
+  }
+}

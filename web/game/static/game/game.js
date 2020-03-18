@@ -1,3 +1,6 @@
+// game.js
+// Plays client-side game
+
 const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + '/ws' + window.location.pathname);
 
@@ -24,7 +27,7 @@ let messages;
 
 // Set up client
 function setup() {
-  
+
   requestContentInput.style.display = 'none';
 
   // set up user
@@ -60,7 +63,6 @@ function update() {
   if (game_state == 'idle') {
 
     locked_out = false;
-    setCookie('locked_out', locked_out);
 
     if ($('#answer-header').html() == "") {
       get_answer();
@@ -113,6 +115,7 @@ gamesock.onmessage = function (message) {
   const data = JSON.parse(message.data);
 
   if (data.response_type == "update") {
+
     // sync client with server
     game_state = data.game_state;
     current_time = data.current_time;
@@ -213,8 +216,26 @@ gamesock.onmessage = function (message) {
     answerHeader.innerHTML = `Answer: ${data.answer}`;
   }
   else if (data.response_type == "lock_out") {
-    locked_out = true;
-    setCookie('locked_out', locked_out);
+    locked_out = data.locked_out;
+  }
+  else if (data.response_type == "buzz_grant") {
+
+    // Grant local client buzz
+    current_action = 'buzz';
+
+    requestContentInput.value = '';
+    requestContentInput.style.display = '';
+    buzz_passed_time = 0;
+
+    nextBtn.style.display = 'none';
+    buzzBtn.style.display = 'none';
+    chatBtn.style.display = 'none';
+
+    game_state = 'contest';
+
+    setTimeout(function () {
+      requestContentInput.focus();
+    }, 1);
   }
 }
 
@@ -265,26 +286,11 @@ function set_name() {
 // Buzz
 function buzz() {
   if (!locked_out && game_state == 'playing') {
-    current_action = 'buzz';
-
-    requestContentInput.value = '';
-    requestContentInput.style.display = '';
-    buzz_passed_time = 0;
-
-    nextBtn.style.display = 'none';
-    buzzBtn.style.display = 'none';
-    chatBtn.style.display = 'none';
-
-    game_state = 'contest';
     gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "buzz_init",
       content: ""
     }));
-
-    setTimeout(function () {
-      requestContentInput.focus();
-    }, 1);
   }
 }
 

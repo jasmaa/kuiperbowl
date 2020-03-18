@@ -2,43 +2,54 @@
 {% load static %}
 
 {% block title %}
-  <title>Kuiperbowl - Home</title>
+<title>Kuiperbowl - Home</title>
 {% endblock %}
 
 {% block content %}
-  <div class="container">
+<div class="container">
   <br>
   <div class="jumbotron">
 
     <h1 class="display-4">Welcome to Kuiperbowl</h1>
 
     <p class="lead">
-      Kuiperbowl is a real-time multiplayer trivia game. It's actually just Protobowl but significantly worse. To enjoy the jank, please join one of the default rooms below, or you can make your own by typing in the field.
+      Kuiperbowl is a real-time multiplayer trivia game. It's actually just Protobowl but significantly worse. To enjoy
+      the jank, please join one of the default rooms below, or you can make your own by typing in the field.
     </p>
 
     <br>
     <div class="container">
-      <div class="center" style="text-align:center;">
-        <a class="btn btn-secondary" href="/game/hs">HS</a>
-        <a class="btn btn-secondary" href="/game/ms">MS</a>
-        <a class="btn btn-secondary" href="/game/college">College</a>
-        <a class="btn btn-secondary" href="/game/trash">Trash</a>
-      </div>
-      <div class="input-group mb-3 center">
-        <input id="landing-content" type="text" class="form-control" placeholder="awesome-room">
-        <div class="input-group-append">
-          <button id="landing-btn" class="btn btn-success" type="button">Go!</button>
-        </div>
-      </div>
-    </div>
 
-    <div class="center" style="text-align:center;">
+      <div style="margin-left: 20%; margin-right: 20%;">
+        <div style="margin-left: 20%; margin-right: 20%;" class="d-flex justify-content-around">
+          <a class="btn btn-secondary" href="/game/hs">HS</a>
+          <a class="btn btn-secondary" href="/game/ms">MS</a>
+          <a class="btn btn-secondary" href="/game/college">College</a>
+          <a class="btn btn-secondary" href="/game/trash">Trash</a>
+        </div>
+
+        <form id="landing-form" class="m-5 needs-validation" novalidate>
+          <div class="form-row">
+            <div class="input-group">
+              <input id="landing-content" type="text" class="form-control" placeholder="awesome-room">
+              <div class="input-group-append">
+                <button id="landing-btn" class="btn btn-success" type="button">Go!</button>
+              </div>
+              <div class="invalid-feedback">
+                Please enter a valid room name. Only the characters 'a-z', '-', and '_' are valid.
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
       {% include "game/donate-button.html" %}
+
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-  <script src={% static "game/home.js" %}></script>
+<script src={% static "game/home.js" %}></script>
 {% endblock %}
