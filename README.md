@@ -1,9 +1,10 @@
 # Kuiperbowl
-![Build badge](https://travis-ci.org/jasmaa/kuiperbowl.svg?branch=master)
+
+[![CircleCI](https://circleci.com/gh/jasmaa/kuiperbowl.svg?style=svg)](https://circleci.com/gh/jasmaa/kuiperbowl)
+
+Real-time multiplayer quizbowl
 
 ![Comet logo](./comet.png)
-
-Real-time multiplayer quizbowl. Functionally similar to Protobowl but significantly worse.
 
 ## Using Docker
 
