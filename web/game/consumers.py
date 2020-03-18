@@ -288,7 +288,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             )
         
         # resume if time up
-        elif datetime.datetime.now().timestamp() >=  room.buzz_start_time + GRACE_TIME:
+        elif datetime.datetime.now().timestamp() >= room.buzz_start_time + GRACE_TIME:
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'
             room.start_time += buzz_duration
