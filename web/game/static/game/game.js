@@ -115,6 +115,7 @@ gamesock.onmessage = function (message) {
   const data = JSON.parse(message.data);
 
   if (data.response_type == "update") {
+
     // sync client with server
     game_state = data.game_state;
     current_time = data.current_time;
@@ -217,6 +218,25 @@ gamesock.onmessage = function (message) {
   else if (data.response_type == "lock_out") {
     locked_out = data.locked_out;
   }
+  else if (data.response_type == "buzz_grant") {
+
+    // Grant local client buzz
+    current_action = 'buzz';
+
+    requestContentInput.value = '';
+    requestContentInput.style.display = '';
+    buzz_passed_time = 0;
+
+    nextBtn.style.display = 'none';
+    buzzBtn.style.display = 'none';
+    chatBtn.style.display = 'none';
+
+    game_state = 'contest';
+
+    setTimeout(function () {
+      requestContentInput.focus();
+    }, 1);
+  }
 }
 
 // Ping server for state
@@ -266,26 +286,11 @@ function set_name() {
 // Buzz
 function buzz() {
   if (!locked_out && game_state == 'playing') {
-    current_action = 'buzz';
-
-    requestContentInput.value = '';
-    requestContentInput.style.display = '';
-    buzz_passed_time = 0;
-
-    nextBtn.style.display = 'none';
-    buzzBtn.style.display = 'none';
-    chatBtn.style.display = 'none';
-
-    game_state = 'contest';
     gamesock.send(JSON.stringify({
       player_id: player_id,
       request_type: "buzz_init",
       content: ""
     }));
-
-    setTimeout(function () {
-      requestContentInput.focus();
-    }, 1);
   }
 }
 

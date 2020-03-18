@@ -18,17 +18,3 @@ landingForm.onsubmit = (e) => {
     landingContent.classList.add('is-invalid');
   }
 }
-
-/*
-landingBtn.onclick = (e) => {
-  gotoRoom();
-}
-
-landingContent.onkeypress = (e) => {
-  if (e.which == 13) {
-    //gotoRoom();
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
-*/

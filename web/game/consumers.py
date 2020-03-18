@@ -216,6 +216,10 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             p.save()
 
             create_message("buzz_init", f"<strong>{p.name}</strong> has buzzed", room)
+
+            await self.send_json({
+                'response_type': 'buzz_grant',
+            })
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
