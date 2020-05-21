@@ -17,23 +17,16 @@ def judge_answer(user_answer, question_answer):
     if len(major_answers) <= 0:
         major_answers = [question_answer]
     
-    return compare_answers(user_answer, major_answers) >= 80
+    r = 0.8*compare_answer_tokens(user_answer, major_answers) + \
+        0.2*compare_answer_partial(user_answer, major_answers)
+
+    return r >= 0.7
 
 
-def compare_answers(user_answer, major_answers):
-    """Compares user answer words with major answer words
-    """
-    # TODO: Make it so sequences matter
+def compare_answer_tokens(user_answer, major_answers):
+    """Compare by ordered tokens"""
+    return max(fuzz.token_sort_ratio(user_answer, major_answer)/100 for major_answer in major_answers)
 
-    user_words = user_answer.split(" ")
-    ratios = []
-
-    for major_answer in major_answers:
-        n = 0
-        r = 0
-        for user_word in user_words:
-            for major_word in major_answer.split(" "):
-                r = max(fuzz.ratio(user_word, major_word), r)
-        ratios.append(r)
-
-    return max(ratios)
+def compare_answer_partial(user_answer, major_answers):
+    """Compare by partial"""
+    return max(fuzz.partial_ratio(user_answer, major_answer)/100 for major_answer in major_answers)

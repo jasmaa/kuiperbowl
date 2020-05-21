@@ -4,7 +4,7 @@
 
 Real-time multiplayer quizbowl
 
-![Comet logo](./comet.png)
+![Comet logo](docs/comet.png)
 
 ## Using Docker
 
