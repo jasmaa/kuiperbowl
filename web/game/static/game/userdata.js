@@ -15,7 +15,7 @@ function retrieve_userdata(){
  * @param {*} val 
  */
 function setCookie(name, val){
-  document.cookie = `${name}=${val}`;
+  document.cookie = `${name}=${val}; path=/`;
 }
 
 /**
