@@ -81,7 +81,7 @@ class Room(models.Model):
         scores = []
         for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
-            scores.append((player.name, player.score, active))
+            scores.append((player.user.name, player.score, active))
         scores.sort(key=lambda tup: tup[1])
         scores.reverse()
         return scores
@@ -92,18 +92,27 @@ class Room(models.Model):
             chrono_messages.append( (m.tag, m.content) )
         return chrono_messages
 
-class Player(models.Model):
-    """Quizbowl player for a room"""
+class User(models.Model):
+    """Site user"""
 
-    player_id = models.PositiveIntegerField(primary_key=True)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='players')
+    user_id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return str(self.name)
+
+class Player(models.Model):
+    """Player in a room"""
+
+    player_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='players')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='players')
     score = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
     last_seen = models.FloatField(default=0)
 
     def __str__(self):
-        return self.name + ":" + str(self.player_id)
+        return str(self.player_id)
 
 class Message(models.Model):
     """Message that can be sent by Players"""

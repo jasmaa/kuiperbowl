@@ -4,8 +4,8 @@
 const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + '/ws' + window.location.pathname);
 
-let player_name;
-let player_id;
+let user_name;
+let user_id;
 let locked_out;
 
 let game_state = 'idle';
@@ -32,7 +32,7 @@ function setup() {
 
   // set up user
   retrieve_userdata();
-  if (player_id == undefined) {
+  if (user_id == undefined) {
     new_user();
   }
   else {
@@ -40,7 +40,7 @@ function setup() {
     join();
   }
 
-  nameInput.value = player_name;
+  nameInput.value = user_name;
 
   // set up current time if newly joined
   current_time = buzz_start_time;
@@ -202,14 +202,14 @@ gamesock.onmessage = function (message) {
     difficultySelect.value = data.difficulty;
   }
   else if (data.response_type == "new_user") {
-    setCookie('player_id', data.player_id);
-    setCookie('player_name', data.player_name);
-    player_id = data.player_id;
-    player_name = data.player_name;
+    setCookie('user_id', data.user_id);
+    setCookie('user_name', data.user_name);
+    user_id = data.user_id;
+    user_name = data.user_name;
     locked_out = false;
 
     // Update name
-    name.value = player_name;
+    name.value = user_name;
     ping();
   }
   else if (data.response_type == "send_answer") {
@@ -242,7 +242,7 @@ gamesock.onmessage = function (message) {
 // Ping server for state
 function ping() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "ping",
     content: ""
   }));
@@ -250,7 +250,7 @@ function ping() {
 
 function join() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "join",
     content: ""
   }));
@@ -258,7 +258,7 @@ function join() {
 
 function leave() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "leave",
     content: ""
   }));
@@ -267,7 +267,7 @@ function leave() {
 // Request new user
 function new_user() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "new_user",
     content: ""
   }));
@@ -275,9 +275,9 @@ function new_user() {
 
 // Request change name
 function set_name() {
-  setCookie('player_name', name.value);
+  setCookie('user_name', name.value);
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "set_name",
     content: name.value,
   }));
@@ -287,7 +287,7 @@ function set_name() {
 function buzz() {
   if (!locked_out && game_state == 'playing') {
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "buzz_init",
       content: ""
     }));
@@ -326,7 +326,7 @@ function send_chat() {
     }
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "chat",
       content: requestContentInput.value,
     }));
@@ -345,7 +345,7 @@ function answer() {
     current_action = 'idle';
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "buzz_answer",
       content: requestContentInput.value,
     }));
@@ -358,7 +358,7 @@ function next() {
     questionSpace.innerHTML = '';
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "next",
       content: ""
     }));
@@ -393,7 +393,7 @@ function set_difficulty() {
 // resets score
 function reset_score() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "reset_score",
   }));
 }

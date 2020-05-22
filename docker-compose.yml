@@ -5,25 +5,26 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - web-static: /usr/src/app/static
+      - "web-static:/usr/src/app/static"
     ports:
       - "80:80"
     links:
-      - web:web
+      - "web:web"
 
   web:
     build: ./web
     expose:
       - 8000
     links:
-      - redis: redis
-      - postgres: postgres
+      - "redis:redis"
+      - "postgres:postgres"
     volumes:
-      - web-static: /usr/src/app/static
+      - web-static:/usr/src/app/static
     env_file: .env
     command: bash -c "
       python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
+      python manage.py loaddata fixtures/sample.json &&
       daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:application"
 
   redis:
@@ -31,7 +32,7 @@ services:
     expose:
       - 6379
     volumes:
-      - redisdata: /data
+      - "redisdata:/data"
 
   postgres:
     image: postgres:11.7-alpine
@@ -40,7 +41,7 @@ services:
     environment: 
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - pgdata: /var/lib/postgresql/data/
+      - pgdata:/var/lib/postgresql/data/
 
 volumes:
   web-static:

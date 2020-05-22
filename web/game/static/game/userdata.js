@@ -4,8 +4,8 @@
  */
 function retrieve_userdata(){
   const prefs = cookieToDict(document.cookie);
-  player_name = prefs['player_name'];
-  player_id = prefs['player_id'];
+  user_name = prefs['user_name'];
+  user_id = prefs['user_id'];
   locked_out = prefs['locked_out'] === 'true';
 }
 
