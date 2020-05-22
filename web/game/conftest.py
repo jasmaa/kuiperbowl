@@ -16,17 +16,24 @@ def django_db_setup(django_db_setup, django_db_blocker):
             duration=23.6,
             difficulty="HS",
         )
+
         Room.objects.create(
             label='testroom',
         )
+
         Player.objects.create(
-            player_id=1,
+            user=User.objects.create(
+                user_id=1,
+                name="chad"
+            ),
             room=Room.objects.get(label='testroom'),
-            name="chad",
-            last_seen=datetime.datetime.now().timestamp()
+            last_seen=datetime.datetime.now().timestamp(),
         )
+        
         Player.objects.create(
-            player_id=2,
+            user=User.objects.create(
+                user_id=2,
+                name="vivian",
+            ),
             room=Room.objects.get(label='testroom'),
-            name="vivian",
         )
