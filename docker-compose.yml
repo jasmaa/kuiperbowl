@@ -5,7 +5,7 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - web-static:/usr/src/app/static
+      - web-static: /usr/src/app/static
     ports:
       - "80:80"
     links:
@@ -16,10 +16,10 @@ services:
     expose:
       - 8000
     links:
-      - redis:redis
-      - postgres:postgres
+      - redis: redis
+      - postgres: postgres
     volumes:
-      - web-static:/usr/src/app/static
+      - web-static: /usr/src/app/static
     env_file: .env
     command: bash -c "
       python manage.py collectstatic --noinput --clear &&
@@ -31,7 +31,7 @@ services:
     expose:
       - 6379
     volumes:
-      - redisdata:/data
+      - redisdata: /data
 
   postgres:
     image: postgres:11.7-alpine
@@ -40,7 +40,7 @@ services:
     environment: 
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - pgdata:/var/lib/postgresql/data/
+      - pgdata: /var/lib/postgresql/data/
 
 volumes:
   web-static:
