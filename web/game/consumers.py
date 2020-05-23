@@ -192,6 +192,11 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 if room.category == 'Everything'
                 else Question.objects.filter(Q(category=room.category) & Q(difficulty=room.difficulty))
             )
+
+            # Abort if no questions
+            if len(questions) <= 0:
+                return
+
             q = random.choice(questions)
 
             room.state = 'playing'
@@ -349,6 +354,11 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             # generate random question for now if empty
             if room.current_question == None:
                 questions = Question.objects.all()
+
+                # Abort if no questions
+                if len(questions) <= 0:
+                    return
+
                 q = random.choice(questions)
                 room.current_question = q
                 room.save()
@@ -369,8 +379,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         try:
             room.category = clean_content(data['content'])
-            room.current_question = random.choice(Question.objects.all()) if room.current_question == None else room.current_question
-            room.buzz_player = room.players.first()
             room.full_clean()
             room.save()
 
@@ -390,12 +398,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         try:
             room.difficulty = clean_content(data['content'])
-            room.current_question = (
-                random.choice(Question.objects.all())
-                if room.current_question == None
-                else room.current_question
-            )
-            room.buzz_player = room.players.first()
             room.full_clean()
             room.save()
 
