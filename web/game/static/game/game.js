@@ -31,7 +31,9 @@ function setup() {
   requestContentInput.style.display = 'none';
 
   // set up user
+  
   retrieve_userdata();
+
   if (user_id == undefined) {
     new_user();
   }
@@ -369,6 +371,7 @@ function next() {
 function get_answer() {
   if (game_state == 'idle') {
     gamesock.send(JSON.stringify({
+      user_id: user_id,
       request_type: "get_answer",
     }));
   }
@@ -377,6 +380,7 @@ function get_answer() {
 // Set category
 function set_category() {
   gamesock.send(JSON.stringify({
+    user_id: user_id,
     request_type: "set_category",
     content: categorySelect.value,
   }));
@@ -385,6 +389,7 @@ function set_category() {
 // Set difficulty
 function set_difficulty() {
   gamesock.send(JSON.stringify({
+    user_id: user_id,
     request_type: "set_difficulty",
     content: difficultySelect.value,
   }));
