@@ -47,7 +47,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         data = json.loads(text_data)
         room = Room.objects.get(label=self.room_name)
-
+        
+        # TEMP: Debug print
         print(data)
 
         if data['request_type'] == 'new_user':

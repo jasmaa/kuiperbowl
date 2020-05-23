@@ -95,7 +95,7 @@ class Room(models.Model):
 class User(models.Model):
     """Site user"""
 
-    user_id = models.PositiveIntegerField(primary_key=True)
+    user_id = models.CharField(max_length=100)
     name = models.CharField(max_length=20)
     
     def __str__(self):
