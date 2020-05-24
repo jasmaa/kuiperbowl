@@ -24,7 +24,6 @@ $(document).ready(function () {
 });
 
 // Timed events
-window.setTimeout(setup, 600);
 window.setInterval(ping, 5000);
 window.setInterval(update, 100);
 

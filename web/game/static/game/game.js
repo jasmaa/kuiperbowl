@@ -26,19 +26,17 @@ let scores;
 let messages;
 
 // Set up client
-function setup() {
+gamesock.onopen = () => {
 
   requestContentInput.style.display = 'none';
 
   // set up user
-  
+
   retrieve_userdata();
 
   if (user_id == undefined) {
     new_user();
-  }
-  else {
-    ping();
+  } else {
     join();
   }
 
