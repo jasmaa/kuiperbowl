@@ -34,7 +34,7 @@ services:
       - "redisdata:/data"
 
   postgres:
-    image: postgres:11.7-alpine
+    image: postgres:latest
     expose:
       - 5432
     environment: 
