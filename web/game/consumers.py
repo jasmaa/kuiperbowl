@@ -47,8 +47,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         data = json.loads(text_data)
         room = Room.objects.get(label=self.room_name)
-
-         # TEMP: Debug print
+        
+        # TEMP: Debug print
         print(data)
 
         # Create new user and join room
@@ -251,6 +251,14 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
     async def buzz_init(self, room, data):
         """Initialize buzz
         """
+        
+        # Reject when not in contest
+        if room.state != 'playing':
+            return
+
+        # Abort if no current question
+        if room.current_question == None:
+            return
 
         # Get player
         user = User.objects.filter(user_id=data['user_id']).first()
@@ -286,8 +294,12 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
     async def buzz_answer(self, room, data):
 
-        # Reject non-contest messages
+        # Reject when not in contest
         if room.state != 'contest':
+            return
+
+        # Abort if no buzz player or current question
+        if room.buzz_player == None or room.current_question == None:
             return
 
         # Get player

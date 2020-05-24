@@ -63,11 +63,11 @@ class Room(models.Model):
     label = models.SlugField(unique=True)
     state = models.CharField(max_length=9, choices=game_states, default=IDLE)
 
-    current_question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='rooms', null=True)
+    current_question = models.ForeignKey(Question, on_delete=models.SET_NULL, related_name='rooms', null=True, blank=True)
     start_time = models.FloatField(default=0)
     end_time = models.FloatField(default=1)
 
-    buzz_player = models.OneToOneField('Player', on_delete=models.CASCADE, null=True, related_name='buzz_player')
+    buzz_player = models.OneToOneField('Player', on_delete=models.SET_NULL, null=True, blank=True, related_name='buzz_player')
     buzz_start_time = models.FloatField(default=0)
     buzz_end_time = models.FloatField(default=1)
 
