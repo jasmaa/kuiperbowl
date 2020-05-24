@@ -150,39 +150,74 @@ gamesock.onmessage = function (message) {
 
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
-      const tag = messages[i][0]
+      const [tag, user, content] = messages[i];
       const icon = document.createElement('i');
+      let msgHTML;
+
+      console.log(messages[i])
 
       icon.style.margin = '0.5em';
-      if (tag == "buzz_correct") {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.color = '#00cc00';
+      switch (tag) {
+        case "buzz_correct":
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.color = '#00cc00';
+          break;
+        case "buzz_wrong":
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.color = '#cc0000';
+          break;
+        case "chat":
+          icon.classList.add('far');
+          icon.classList.add('fa-comment-alt');
+          icon.style.color = '#aaaaaa';
+          break;
+        case "leave":
+          icon.classList.add('fas');
+          icon.classList.add('fa-door-open');
+          icon.style.color = '#99bbff';
+          break;
+        case "join":
+          icon.classList.add('fas');
+          icon.classList.add('fa-sign-in-alt');
+          icon.style.color = '#99bbff';
+          break;
+        default:
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.opacity = 0;
+          break;
       }
-      else if (tag == "buzz_wrong") {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.color = '#cc0000';
-      }
-      else if (tag == "chat") {
-        icon.classList.add('far');
-        icon.classList.add('fa-comment-alt');
-        icon.style.color = '#aaaaaa';
-      }
-      else if (tag == "leave") {
-        icon.classList.add('fas');
-        icon.classList.add('fa-door-open');
-        icon.style.color = '#99bbff';
-      }
-      else if (tag == "join") {
-        icon.classList.add('fas');
-        icon.classList.add('fa-sign-in-alt');
-        icon.style.color = '#99bbff';
-      }
-      else {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.opacity = 0;
+
+      switch (tag) {
+        case "join":
+          msgHTML = `<strong>${user}</strong> has joined the room`;
+          break;
+        case "leave":
+          msgHTML = `<strong>${user}</strong> has left the room`;
+          break;
+        case "buzz_init":
+          msgHTML = `<strong>${user}</strong> has buzzed`;
+          break;
+        case "buzz_correct":
+          msgHTML = `<strong>${user}</strong> has correctly answered <strong>${content}</strong>`;
+          break;
+        case "buzz_wrong":
+          msgHTML = `<strong>${user}</strong> has incorrectly answered <strong>${content}</strong>`;
+          break;
+        case "set_category":
+          msgHTML = `<strong>${user}</strong> has changed the category to <strong>${content}</strong>`;
+          break;
+        case "set_difficulty":
+          msgHTML = `<strong>${user}</strong> has changed the difficulty to <strong>${content}</strong>`;
+          break;
+        case "reset_score":
+          msgHTML = `<strong>${user}</strong> has reset their score`;
+          break;
+        case "chat":
+          msgHTML = `<strong>${user}</strong>: ${content}`;
+          break;
       }
 
       const li = document.createElement('li');
@@ -192,7 +227,7 @@ gamesock.onmessage = function (message) {
       li.style.alignItems = 'center';
       li.append(icon);
       const msg = document.createElement('div');
-      msg.innerHTML = messages[i][1];
+      msg.innerHTML = msgHTML;
       li.append(msg);
       messageSpace.append(li);
     }
