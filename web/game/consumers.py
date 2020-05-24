@@ -135,6 +135,11 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         if user == None:
             return
 
+        # Create player if doesn't exist
+        p = user.players.filter(room=room).first()
+        if p == None:
+            p = Player.objects.create(room=room, user=user)
+
         create_message("join", f"<strong>{user.name}</strong> has joined the room", room)
 
         await self.send_json(get_response_json(room))
@@ -168,9 +173,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """Create new user and player in room
         """
         user = User.objects.create(user_id=generate_id(), name=generate_name())
-
-        # Create new player
-        p = Player.objects.create(room=room, user=user)
 
         await self.send_json({
             "response_type": "new_user",
