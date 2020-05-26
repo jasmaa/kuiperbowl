@@ -47,9 +47,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         data = json.loads(text_data)
         room = Room.objects.get(label=self.room_name)
 
-        # TEMP: Debug print
-        print(data)
-
         # Create new user and join room
         if data['request_type'] == 'new_user':
             user = await self.new_user(room)
