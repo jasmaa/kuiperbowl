@@ -18,18 +18,21 @@ def convert():
         for i, entry in enumerate(data.split('\n')):
 
             entry = json.loads(entry)
-                
-            output.append({
-                "model": "game.question",
-                "pk": i+1,
-                "fields": {
-                    "category": entry['category'],
-                    "points": 20,
-                    "content": entry['question'],
-                    "answer": entry['answer'],
-                    "duration": len(entry['question']) / 30,
-                }
-            })
+
+            # Only keep entries with curlies
+            if '{' in entry['answer'] and '}' in entry['answer']:
+                output.append({
+                    "model": "game.question",
+                    "pk": i+1,
+                    "fields": {
+                        "category": entry['category'],
+                        "points": 20,
+                        "content": entry['question'],
+                        "answer": entry['answer'],
+                        "duration": len(entry['question']) / 30,
+                    }
+                })
+
     with open('./fixtures/pbdump.json', 'w') as f:
         json.dump(output, f)
         print("Created /fixtures/pbdump.json")

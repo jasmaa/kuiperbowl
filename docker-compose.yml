@@ -5,19 +5,19 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - web-static:/usr/src/app/static
+      - "web-static:/usr/src/app/static"
     ports:
       - "80:80"
     links:
-      - web:web
+      - "web:web"
 
   web:
     build: ./web
     expose:
       - 8000
     links:
-      - redis:redis
-      - postgres:postgres
+      - "redis:redis"
+      - "postgres:postgres"
     volumes:
       - web-static:/usr/src/app/static
     env_file: .env
@@ -31,10 +31,10 @@ services:
     expose:
       - 6379
     volumes:
-      - redisdata:/data
+      - "redisdata:/data"
 
   postgres:
-    image: postgres:11.7-alpine
+    image: postgres:latest
     expose:
       - 5432
     environment: 

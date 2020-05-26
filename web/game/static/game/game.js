@@ -4,8 +4,8 @@
 const ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 const gamesock = new WebSocket(ws_scheme + '://' + window.location.host + '/ws' + window.location.pathname);
 
-let player_name;
-let player_id;
+let user_name;
+let user_id;
 let locked_out;
 
 let game_state = 'idle';
@@ -26,21 +26,21 @@ let scores;
 let messages;
 
 // Set up client
-function setup() {
+gamesock.onopen = () => {
 
   requestContentInput.style.display = 'none';
 
   // set up user
+
   retrieve_userdata();
-  if (player_id == undefined) {
+
+  if (user_id == undefined) {
     new_user();
-  }
-  else {
-    ping();
+  } else {
     join();
   }
 
-  nameInput.value = player_name;
+  nameInput.value = user_name;
 
   // set up current time if newly joined
   current_time = buzz_start_time;
@@ -150,39 +150,74 @@ gamesock.onmessage = function (message) {
 
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
-      const tag = messages[i][0]
+      const [tag, user, content] = messages[i];
       const icon = document.createElement('i');
+      let msgHTML;
+
+      console.log(messages[i])
 
       icon.style.margin = '0.5em';
-      if (tag == "buzz_correct") {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.color = '#00cc00';
+      switch (tag) {
+        case "buzz_correct":
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.color = '#00cc00';
+          break;
+        case "buzz_wrong":
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.color = '#cc0000';
+          break;
+        case "chat":
+          icon.classList.add('far');
+          icon.classList.add('fa-comment-alt');
+          icon.style.color = '#aaaaaa';
+          break;
+        case "leave":
+          icon.classList.add('fas');
+          icon.classList.add('fa-door-open');
+          icon.style.color = '#99bbff';
+          break;
+        case "join":
+          icon.classList.add('fas');
+          icon.classList.add('fa-sign-in-alt');
+          icon.style.color = '#99bbff';
+          break;
+        default:
+          icon.classList.add('far');
+          icon.classList.add('fa-circle');
+          icon.style.opacity = 0;
+          break;
       }
-      else if (tag == "buzz_wrong") {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.color = '#cc0000';
-      }
-      else if (tag == "chat") {
-        icon.classList.add('far');
-        icon.classList.add('fa-comment-alt');
-        icon.style.color = '#aaaaaa';
-      }
-      else if (tag == "leave") {
-        icon.classList.add('fas');
-        icon.classList.add('fa-door-open');
-        icon.style.color = '#99bbff';
-      }
-      else if (tag == "join") {
-        icon.classList.add('fas');
-        icon.classList.add('fa-sign-in-alt');
-        icon.style.color = '#99bbff';
-      }
-      else {
-        icon.classList.add('far');
-        icon.classList.add('fa-circle');
-        icon.style.opacity = 0;
+
+      switch (tag) {
+        case "join":
+          msgHTML = `<strong>${user}</strong> has joined the room`;
+          break;
+        case "leave":
+          msgHTML = `<strong>${user}</strong> has left the room`;
+          break;
+        case "buzz_init":
+          msgHTML = `<strong>${user}</strong> has buzzed`;
+          break;
+        case "buzz_correct":
+          msgHTML = `<strong>${user}</strong> has correctly answered <strong>${content}</strong>`;
+          break;
+        case "buzz_wrong":
+          msgHTML = `<strong>${user}</strong> has incorrectly answered <strong>${content}</strong>`;
+          break;
+        case "set_category":
+          msgHTML = `<strong>${user}</strong> has changed the category to <strong>${content}</strong>`;
+          break;
+        case "set_difficulty":
+          msgHTML = `<strong>${user}</strong> has changed the difficulty to <strong>${content}</strong>`;
+          break;
+        case "reset_score":
+          msgHTML = `<strong>${user}</strong> has reset their score`;
+          break;
+        case "chat":
+          msgHTML = `<strong>${user}</strong>: ${content}`;
+          break;
       }
 
       const li = document.createElement('li');
@@ -192,7 +227,7 @@ gamesock.onmessage = function (message) {
       li.style.alignItems = 'center';
       li.append(icon);
       const msg = document.createElement('div');
-      msg.innerHTML = messages[i][1];
+      msg.innerHTML = msgHTML;
       li.append(msg);
       messageSpace.append(li);
     }
@@ -202,14 +237,14 @@ gamesock.onmessage = function (message) {
     difficultySelect.value = data.difficulty;
   }
   else if (data.response_type == "new_user") {
-    setCookie('player_id', data.player_id);
-    setCookie('player_name', data.player_name);
-    player_id = data.player_id;
-    player_name = data.player_name;
+    setCookie('user_id', data.user_id);
+    setCookie('user_name', data.user_name);
+    user_id = data.user_id;
+    user_name = data.user_name;
     locked_out = false;
 
     // Update name
-    name.value = player_name;
+    name.value = user_name;
     ping();
   }
   else if (data.response_type == "send_answer") {
@@ -242,7 +277,7 @@ gamesock.onmessage = function (message) {
 // Ping server for state
 function ping() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "ping",
     content: ""
   }));
@@ -250,7 +285,7 @@ function ping() {
 
 function join() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "join",
     content: ""
   }));
@@ -258,7 +293,7 @@ function join() {
 
 function leave() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "leave",
     content: ""
   }));
@@ -267,7 +302,7 @@ function leave() {
 // Request new user
 function new_user() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "new_user",
     content: ""
   }));
@@ -275,9 +310,9 @@ function new_user() {
 
 // Request change name
 function set_name() {
-  setCookie('player_name', name.value);
+  setCookie('user_name', name.value);
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "set_name",
     content: name.value,
   }));
@@ -287,7 +322,7 @@ function set_name() {
 function buzz() {
   if (!locked_out && game_state == 'playing') {
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "buzz_init",
       content: ""
     }));
@@ -326,7 +361,7 @@ function send_chat() {
     }
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "chat",
       content: requestContentInput.value,
     }));
@@ -345,7 +380,7 @@ function answer() {
     current_action = 'idle';
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "buzz_answer",
       content: requestContentInput.value,
     }));
@@ -358,7 +393,7 @@ function next() {
     questionSpace.innerHTML = '';
 
     gamesock.send(JSON.stringify({
-      player_id: player_id,
+      user_id: user_id,
       request_type: "next",
       content: ""
     }));
@@ -369,6 +404,7 @@ function next() {
 function get_answer() {
   if (game_state == 'idle') {
     gamesock.send(JSON.stringify({
+      user_id: user_id,
       request_type: "get_answer",
     }));
   }
@@ -377,6 +413,7 @@ function get_answer() {
 // Set category
 function set_category() {
   gamesock.send(JSON.stringify({
+    user_id: user_id,
     request_type: "set_category",
     content: categorySelect.value,
   }));
@@ -385,6 +422,7 @@ function set_category() {
 // Set difficulty
 function set_difficulty() {
   gamesock.send(JSON.stringify({
+    user_id: user_id,
     request_type: "set_difficulty",
     content: difficultySelect.value,
   }));
@@ -393,7 +431,7 @@ function set_difficulty() {
 // resets score
 function reset_score() {
   gamesock.send(JSON.stringify({
-    player_id: player_id,
+    user_id: user_id,
     request_type: "reset_score",
   }));
 }
