@@ -29,7 +29,7 @@ window.setInterval(update, 100);
 
 window.onbeforeunload = leave;
 
-name.oninput = set_name;
+name.oninput = setName;
 
 document.onkeypress = (e) => {
   if (e.target.tagName != 'INPUT') {
@@ -41,25 +41,25 @@ document.onkeypress = (e) => {
       e.preventDefault();
     }
     else if (e.which == 99) {
-      chat_init();
+      chatInit();
     }
   }
 }
 
 requestContentInput.onkeypress = (e) => {
   if (e.which == 13) {
-    if (current_action == 'buzz') {
+    if (currentAction == 'buzz') {
       answer();
     }
-    else if (current_action == 'chat') {
-      send_chat();
+    else if (currentAction == 'chat') {
+      sendChat();
     }
   }
 }
 
-categorySelect.onchange = set_category;
-difficultySelect.onchange = set_difficulty;
+categorySelect.onchange = setCategory;
+difficultySelect.onchange = setDifficulty;
 buzzBtn.onclick = buzz;
 nextBtn.onclick = next;
-resetBtn.onclick = reset_score;
-chatBtn.onclick = chat_init
+resetBtn.onclick = resetScore;
+chatBtn.onclick = chatInit
