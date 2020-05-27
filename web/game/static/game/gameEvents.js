@@ -61,9 +61,5 @@ categorySelect.onchange = set_category;
 difficultySelect.onchange = set_difficulty;
 buzzBtn.onclick = buzz;
 nextBtn.onclick = next;
-resetBtn.onclick = () => {
-  if (confirm("Are you sure you want to reset?")) {
-    reset_score();
-  }
-}
+resetBtn.onclick = reset_score;
 chatBtn.onclick = chat_init
