@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  <title>Kuiperbowl - {{ room.label }}</title>
+<title>Kuiperbowl - {{ room.label }}</title>
 {% endblock %}
 
 {% block content %}
@@ -12,12 +12,17 @@
 
     <div class="col">
       <input type="text" id="request-content" class="form-control" maxlength="200">
-      <div id="chat-btn" class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Shortcut: C">Chat</div>
-      <div id="next-btn" class="btn btn-info btn-lg" data-toggle="tooltip" data-placement="top" title="Shortcut: N">Next</div>
-      <div id="buzz-btn" class="btn btn-danger btn-lg float-right" data-toggle="tooltip" data-placement="top" title="Shortcut: SPACE">Buzz</div>
+      <div id="chat-btn" class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top"
+        title="Shortcut: C">Chat</div>
+      <div id="next-btn" class="btn btn-info btn-lg" data-toggle="tooltip" data-placement="top" title="Shortcut: N">Next
+      </div>
+      <div id="buzz-btn" class="btn btn-danger btn-lg float-right" data-toggle="tooltip" data-placement="top"
+        title="Shortcut: SPACE">Buzz</div>
       <div class="progress">
-        <div id=content-progress class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        <div id=buzz-progress class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id=content-progress class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0"
+          aria-valuemin="0" aria-valuemax="100"></div>
+        <div id=buzz-progress class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0"
+          aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
   </div>
@@ -30,7 +35,7 @@
       <div class="card">
         <div class="card-header">Settings</div>
         <div class="card-body">
-          Category:
+          <label for="category-select">Category:</label>
           <select id="category-select" class="form-control">
             <option value="Everything">Everything</option>
             <option value="Science">Science</option>
@@ -45,7 +50,7 @@
             <option value="Trash">Trash</option>
           </select>
           <br>
-          Difficulty:
+          <label for="difficulty-select">Difficulty:</label>
           <select id="difficulty-select" class="form-control">
             <option value="HS">HS</option>
             <option value="MS">MS</option>
@@ -62,17 +67,20 @@
 
       <div class="card">
         <div class="card-header">Scoreboard</div>
-        <input type="text" id="name" maxlength="20">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Score</th>
-            </tr>
-          </thead>
-          <tbody id="scoreboard-body">
-          </tbody>
-        </table>
+        <div class="card-body">
+          <label for="name">Handle:</label>
+          <input class="form-control mb-3" type="text" id="name" maxlength="20" />
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Score</th>
+              </tr>
+            </thead>
+            <tbody id="scoreboard-body">
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -99,7 +107,8 @@
 {% endblock %}
 
 {% block scripts %}
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.js"></script>
-  <script type="text/javascript" src={% static "game/game.js" %}></script>
-  <script type="text/javascript" src={% static "game/gameEvents.js" %}></script>
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.js"></script>
+<script type="text/javascript" src={% static "game/game.js" %}></script>
+<script type="text/javascript" src={% static "game/gameEvents.js" %}></script>
 {% endblock %}

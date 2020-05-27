@@ -154,8 +154,6 @@ gamesock.onmessage = function (message) {
       const icon = document.createElement('i');
       let msgHTML;
 
-      console.log(messages[i])
-
       icon.style.margin = '0.5em';
       switch (tag) {
         case "buzz_correct":
