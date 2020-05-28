@@ -103,9 +103,15 @@ class Room(models.Model):
         scores = []
         for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
-            scores.append((player.user.name, player.score, active))
-        scores.sort(key=lambda tup: tup[1])
-        scores.reverse()
+            scores.append({
+                'user_name': player.user.name,
+                'score': player.score,
+                'correct': player.correct,
+                'negs': player.negs,
+                'last_seen': player.last_seen,
+                'active': active,
+            })
+        scores.sort(key=lambda player: player['score'])
         return scores
 
     def get_messages(self):
@@ -140,6 +146,8 @@ class Player(models.Model):
         related_name='players',
     )
     score = models.IntegerField(default=0)
+    correct = models.IntegerField(default=0)
+    negs = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
     last_seen = models.FloatField(default=0)
 

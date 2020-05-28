@@ -129,30 +129,55 @@ gamesock.onmessage = message => {
     scores = data['scores'];
     messages = data['messages'];
 
-    // update ui
+    // Update scoreboard
+    // TODO: Make it so we don't have to redo popover??
+    $('[data-toggle="popover"]').popover('hide')
     scoreboard.innerHTML = '';
     for (i = 0; i < scores.length; i++) {
       const icon = document.createElement('i');
       icon.classList.add('fas');
       icon.classList.add('fa-circle');
       icon.style.margin = '0.5em';
-      if (scores[i][2]) {
-        icon.style.color = '#00ff00';
-      }
-      else {
-        icon.style.color = '#aaaaaa';
-      }
+      icon.style.color = scores[i]['active'] ? '#00ff00' : '#aaaaaa';
+
       const row = scoreboard.insertRow(icon);
+      row.setAttribute('tabindex', 1)
+      row.setAttribute('data-toggle', 'popover');
+      row.setAttribute('data-trigger', 'hover');
+      row.setAttribute('title', scores[i]['user_name']);
+      row.setAttribute('data-content', `
+        <table class="table">
+          <tbody>
+          <tr>
+            <td>Correct</td>
+            <td>${scores[i]['correct']}</td>
+          </tr>
+          <tr>
+            <td>Negs</td>
+            <td>${scores[i]['negs']}</td>
+          </tr>
+          <tr>
+            <td>Last Seen</td>
+            <td>${scores[i]['last_seen']}</td>
+          </tr>
+        </tbody>
+        </table>
+      `);
+      $(row).popover({ html: true });
+
       const cell1 = row.insertCell();
       cell1.append(icon);
-      cell1.append(scores[i][0]);
+      cell1.append(scores[i]['user_name']);
       const cell2 = row.insertCell();
-      cell2.append(scores[i][1])
+      cell2.append(scores[i]['score']);
     }
 
+    // Update messages
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
+
       const [tag, user, content] = messages[i];
+
       const icon = document.createElement('i');
       let msgHTML;
 

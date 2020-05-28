@@ -306,6 +306,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
             if judge_answer(cleaned_content, room.current_question.answer):
                 p.score += room.current_question.points
+                p.correct += 1
                 p.save()
 
                 # Quick end question
@@ -321,8 +322,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             else:
                 # Question reading ended, do penalty
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
-                    room.buzz_player.score -= 10
-                    room.buzz_player.save()
+                    p.score -= 10
+                    p.negs += 1
+                    p.save()
 
                 create_message(
                     "buzz_wrong",

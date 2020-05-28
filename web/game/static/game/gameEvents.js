@@ -18,9 +18,10 @@ const buzzBtn = document.getElementById('buzz-btn');
 const chatBtn = document.getElementById('chat-btn');
 const resetBtn = document.getElementById('reset-btn');
 
-// Init tooltips
-$(document).ready(function () {
+// Init tooltip and popover
+$(document).ready(() => {
   $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="popover"]').popover();
 });
 
 // Timed events
