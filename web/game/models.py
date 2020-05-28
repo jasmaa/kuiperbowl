@@ -99,20 +99,23 @@ class Room(models.Model):
     def __str__(self):
         return self.label
 
-    def get_scores(self):
-        scores = []
+    def get_players(self, p):
+        player_list = []
         for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
-            scores.append({
+
+            player_list.append({
                 'user_name': player.user.name,
+                'player_id': player.player_id,
                 'score': player.score,
                 'correct': player.correct,
                 'negs': player.negs,
                 'last_seen': player.last_seen,
+                'muted': len(p.muted.filter(player_id=player.player_id)) > 0,
                 'active': active,
             })
-        scores.sort(key=lambda player: player['score'])
-        return scores
+        player_list.sort(key=lambda player: player['score'])
+        return player_list
 
     def get_messages(self):
         chrono_messages = []
@@ -149,10 +152,11 @@ class Player(models.Model):
     correct = models.IntegerField(default=0)
     negs = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
-    last_seen = models.FloatField(default=0)
 
-    def __str__(self):
-        return str(self.player_id)
+    banned = models.BooleanField(default=False)
+    muted = models.ManyToManyField('Player')
+
+    last_seen = models.FloatField(default=0)
 
 
 class Message(models.Model):

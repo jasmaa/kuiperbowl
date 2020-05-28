@@ -14,6 +14,8 @@ import random
 
 GRACE_TIME = 3
 
+# TODO: Use channels authentication?
+
 
 class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
     """Websocket consumer for quizbowl game
@@ -92,6 +94,10 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 await self.reset_score(room, data)
             elif data['request_type'] == 'chat':
                 await self.chat(room, data)
+            elif data['request_type'] == 'get_players':
+                await self.get_players(room, data)
+            elif data['request_type'] == 'toggle_mute':
+                await self.toggle_mute(room, data)
             else:
                 pass
 
@@ -136,6 +142,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         create_message("join", user, None, room)
 
         await self.send_json(get_response_json(room))
+        await self.send_json(get_players_json(room, p))
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -508,6 +516,38 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
+    async def get_players(self, room, data):
+        user = User.objects.filter(user_id=data['user_id']).first()
+        if user == None:
+            return
+        p = user.players.filter(room=room).first()
+        if p == None:
+            return
+
+        await self.send_json(get_players_json(room, p))
+
+    async def toggle_mute(self, room, data):
+
+        user = User.objects.filter(user_id=data['user_id']).first()
+        if user == None:
+            return
+        p = user.players.filter(room=room).first()
+        if p == None:
+            return
+
+        muted_p = room.players.filter(player_id=data['content']).first()
+        if muted_p == None:
+            return
+
+        if len(p.muted.filter(player_id=muted_p.player_id)) > 0:
+            p.muted.remove(muted_p)
+        else:
+            p.muted.add(muted_p)
+            
+        p.save()
+
+        await self.send_json(get_players_json(room, p))
+
 
 # === Helper methods ===
 
@@ -521,7 +561,7 @@ def update_time_state(room):
 
 
 def get_response_json(room):
-    """Generates json for update response
+    """Generates JSON for update response
     """
     return {
         "response_type": "update",
@@ -533,9 +573,17 @@ def get_response_json(room):
         "current_question_content": room.current_question.content if room.current_question != None else "",
         "category": room.current_question.category if room.current_question != None else "",
         "room_category": room.category,
-        "scores": room.get_scores(),
         "messages": room.get_messages(),
         "difficulty": room.difficulty,
+    }
+
+
+def get_players_json(room, p):
+    """Generates JSON for players
+    """
+    return {
+        "response_type": "get_players",
+        "players": room.get_players(p),
     }
 
 

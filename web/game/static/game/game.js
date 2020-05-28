@@ -22,7 +22,7 @@ let buzzTime = 8;
 let question;
 let category;
 let currQuestionContent;
-let scores;
+let players;
 let messages;
 
 // Set up client
@@ -50,6 +50,7 @@ gamesock.onopen = () => {
  * Update game locally
  */
 function update() {
+
   if (question === undefined) {
     return;
   }
@@ -62,46 +63,48 @@ function update() {
   contentProgress.style.width = Math.round(100 * (1.05 * timePassed / duration)) + '%';
   questionSpace.innerHTML = currQuestionContent;
 
-  if (gameState === 'idle') {
+  switch (gameState) {
 
-    lockedOut = false;
+    case 'idle':
+      lockedOut = false;
 
-    if (answerHeader.innerHTML === '') {
-      getAnswer();
-    }
+      if (answerHeader.innerHTML === '') {
+        getAnswer();
+      }
 
-    contentProgress.style.width = '0%';
-    questionSpace.innerHTML = question;
-  }
+      contentProgress.style.width = '0%';
+      questionSpace.innerHTML = question;
+      break;
 
-  else if (gameState === 'playing') {
-    buzzPassedTime = 0;
-    currQuestionContent = question.substring(
-      0,
-      Math.round(question.length * (timePassed / (duration - graceTime)))
-    );
-    currentTime += 0.1;
+    case 'playing':
+      buzzPassedTime = 0;
+      currQuestionContent = question.substring(
+        0,
+        Math.round(question.length * (timePassed / (duration - graceTime)))
+      );
+      currentTime += 0.1;
 
-    contentProgress.style.display = '';
-    buzzProgress.style.display = 'none';
-    answerHeader.innerHTML = '';
-  }
+      contentProgress.style.display = '';
+      buzzProgress.style.display = 'none';
+      answerHeader.innerHTML = '';
+      break;
 
-  else if (gameState === 'contest') {
-    timePassed = buzzStartTime - startTime;
-    currQuestionContent = question.substring(
-      0,
-      Math.round(question.length * (timePassed / (duration - graceTime)))
-    );
+    case 'contest':
+      timePassed = buzzStartTime - startTime;
+      currQuestionContent = question.substring(
+        0,
+        Math.round(question.length * (timePassed / (duration - graceTime)))
+      );
 
-    contentProgress.style.display = 'none';
-    buzzProgress.style.display = '';
+      contentProgress.style.display = 'none';
+      buzzProgress.style.display = '';
 
-    // auto answer if over buzz time
-    if (buzzPassedTime >= buzzTime) {
-      answer();
-    }
-    buzzPassedTime += 0.1;
+      // auto answer if over buzz time
+      if (buzzPassedTime >= buzzTime) {
+        answer();
+      }
+      buzzPassedTime += 0.1;
+      break;
   }
 
   // transition to idle if overtime while playing
@@ -126,52 +129,9 @@ gamesock.onmessage = message => {
     buzzStartTime = data['buzz_start_time'];
     question = data['current_question_content'];
     category = data['category'];
-    scores = data['scores'];
     messages = data['messages'];
 
-    // Update scoreboard
-    // TODO: Make it so we don't have to redo popover??
-    $('[data-toggle="popover"]').popover('hide')
-    scoreboard.innerHTML = '';
-    for (i = 0; i < scores.length; i++) {
-      const icon = document.createElement('i');
-      icon.classList.add('fas');
-      icon.classList.add('fa-circle');
-      icon.style.margin = '0.5em';
-      icon.style.color = scores[i]['active'] ? '#00ff00' : '#aaaaaa';
-
-      const row = scoreboard.insertRow(icon);
-      row.setAttribute('tabindex', 1)
-      row.setAttribute('data-toggle', 'popover');
-      row.setAttribute('data-trigger', 'hover');
-      row.setAttribute('title', scores[i]['user_name']);
-      row.setAttribute('data-content', `
-        <table class="table">
-          <tbody>
-          <tr>
-            <td>Correct</td>
-            <td>${scores[i]['correct']}</td>
-          </tr>
-          <tr>
-            <td>Negs</td>
-            <td>${scores[i]['negs']}</td>
-          </tr>
-          <tr>
-            <td>Last Seen</td>
-            <td>${scores[i]['last_seen']}</td>
-          </tr>
-        </tbody>
-        </table>
-      `);
-      $(row).popover({ html: true });
-
-      const cell1 = row.insertCell();
-      cell1.append(icon);
-      cell1.append(scores[i]['user_name']);
-      const cell2 = row.insertCell();
-      cell2.append(scores[i]['score']);
-    }
-
+    // TODO: move messages to separate response type
     // Update messages
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
@@ -299,6 +259,80 @@ gamesock.onmessage = message => {
     setTimeout(() => {
       requestContentInput.focus();
     }, 1);
+
+  } else if (data['response_type'] === 'get_players') {
+
+    players = data['players'];
+
+    // Update scoreboard
+    // TODO: Make it so we don't have to redo popover??
+    $('[data-toggle="popover"]').popover('hide')
+    scoreboard.innerHTML = '';
+    for (i = 0; i < players.length; i++) {
+      const icon = document.createElement('i');
+      icon.classList.add('fas');
+      icon.classList.add('fa-circle');
+      icon.style.margin = '0.5em';
+      icon.style.color = players[i]['active'] ? '#00ff00' : '#aaaaaa';
+
+      // Find last seen
+      const lastSeenDiff = Date.now() / 1000 - new Date(players[i]['last_seen']);
+      let lastSeenMessage = ''
+      if (lastSeenDiff < 1) {
+        lastSeenMessage = 'Now';
+      } else if (lastSeenDiff < 60) {
+        lastSeenMessage = `${Math.round(lastSeenDiff)} seconds ago`;
+      } else if (lastSeenDiff < 3600) {
+        lastSeenMessage = `${Math.round(lastSeenDiff / 60)} minutes ago`;
+      } else if (lastSeenDiff < 86400) {
+        lastSeenMessage = `${Math.round(lastSeenDiff / 3600)} hours ago`;
+      } else {
+        lastSeenMessage = 'Over a day ago';
+      }
+
+      const row = scoreboard.insertRow(icon);
+
+      const cell1 = row.insertCell();
+      cell1.append(icon);
+      cell1.append(players[i]['user_name']);
+      cell1.style = 'word-break: break-all;'
+
+      cell1.style.outline = 'none';
+      cell1.setAttribute('tabindex', 1)
+      cell1.setAttribute('data-toggle', 'popover');
+      cell1.setAttribute('data-trigger', 'hover');
+      cell1.setAttribute('title', players[i]['user_name']);
+      cell1.setAttribute('data-content', `
+        <table class="table">
+          <tbody>
+          <tr>
+            <td>Correct</td>
+            <td>${players[i]['correct']}</td>
+          </tr>
+          <tr>
+            <td>Negs</td>
+            <td>${players[i]['negs']}</td>
+          </tr>
+          <tr>
+            <td>Last Seen</td>
+            <td>${lastSeenMessage}</td>
+          </tr>
+        </tbody>
+        </table>
+      `);
+      $(cell1).popover({ html: true });
+
+      const cell2 = row.insertCell();
+      cell2.append(players[i]['score']);
+
+      const muteBtn = document.createElement('div');
+      muteBtn.className = 'btn btn-sm';
+      muteBtn.innerHTML = `<i class="fas ${players[i]['muted'] ? 'fa-comment-slash' : 'fa-comment'}"></i>`;
+      const playerID = players[i]['player_id'];
+      muteBtn.onclick = () => toggleMutePlayer(playerID);
+      const cell3 = row.insertCell();
+      cell3.append(muteBtn);
+    }
   }
 }
 
@@ -492,5 +526,28 @@ function resetScore() {
   gamesock.send(JSON.stringify({
     user_id: userID,
     request_type: "reset_score",
+  }));
+}
+
+/**
+ * Gets players
+ */
+function getPlayers() {
+  gamesock.send(JSON.stringify({
+    user_id: userID,
+    request_type: "get_players",
+  }));
+}
+
+/**
+ * Mute player
+ * 
+ * @param {*} playerID 
+ */
+function toggleMutePlayer(playerID) {
+  gamesock.send(JSON.stringify({
+    user_id: userID,
+    request_type: "toggle_mute",
+    content: playerID,
   }));
 }
