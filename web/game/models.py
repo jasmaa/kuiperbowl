@@ -111,7 +111,6 @@ class Room(models.Model):
                 'correct': player.correct,
                 'negs': player.negs,
                 'last_seen': player.last_seen,
-                'muted': len(p.muted.filter(player_id=player.player_id)) > 0,
                 'active': active,
             })
         player_list.sort(key=lambda player: player['score'])
@@ -154,7 +153,6 @@ class Player(models.Model):
     locked_out = models.BooleanField(default=False)
 
     banned = models.BooleanField(default=False)
-    muted = models.ManyToManyField('Player')
 
     last_seen = models.FloatField(default=0)
 

@@ -96,8 +96,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 await self.chat(room, data)
             elif data['request_type'] == 'get_players':
                 await self.get_players(room, data)
-            elif data['request_type'] == 'toggle_mute':
-                await self.toggle_mute(room, data)
             else:
                 pass
 
@@ -523,28 +521,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         p = user.players.filter(room=room).first()
         if p == None:
             return
-
-        await self.send_json(get_players_json(room, p))
-
-    async def toggle_mute(self, room, data):
-
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
-
-        muted_p = room.players.filter(player_id=data['content']).first()
-        if muted_p == None:
-            return
-
-        if len(p.muted.filter(player_id=muted_p.player_id)) > 0:
-            p.muted.remove(muted_p)
-        else:
-            p.muted.add(muted_p)
-            
-        p.save()
 
         await self.send_json(get_players_json(room, p))
 

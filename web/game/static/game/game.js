@@ -324,14 +324,6 @@ gamesock.onmessage = message => {
 
       const cell2 = row.insertCell();
       cell2.append(players[i]['score']);
-
-      const muteBtn = document.createElement('div');
-      muteBtn.className = 'btn btn-sm';
-      muteBtn.innerHTML = `<i class="fas ${players[i]['muted'] ? 'fa-comment-slash' : 'fa-comment'}"></i>`;
-      const playerID = players[i]['player_id'];
-      muteBtn.onclick = () => toggleMutePlayer(playerID);
-      const cell3 = row.insertCell();
-      cell3.append(muteBtn);
     }
   }
 }
@@ -536,18 +528,5 @@ function getPlayers() {
   gamesock.send(JSON.stringify({
     user_id: userID,
     request_type: "get_players",
-  }));
-}
-
-/**
- * Mute player
- * 
- * @param {*} playerID 
- */
-function toggleMutePlayer(playerID) {
-  gamesock.send(JSON.stringify({
-    user_id: userID,
-    request_type: "toggle_mute",
-    content: playerID,
   }));
 }
