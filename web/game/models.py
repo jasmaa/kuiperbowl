@@ -99,7 +99,7 @@ class Room(models.Model):
     def __str__(self):
         return self.label
 
-    def get_players(self, p):
+    def get_players(self):
         player_list = []
         for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
@@ -165,6 +165,7 @@ class Message(models.Model):
     BUZZ_INIT = 'buzz_init'
     BUZZ_CORRECT = 'buzz_correct'
     BUZZ_WRONG = 'buzz_wrong'
+    BUZZ_FORFEIT = 'buzz_forfeit'
     SET_CATEGORY = 'set_category'
     SET_DIFFICULTY = 'set_difficulty'
     RESET_SCORE = 'reset_score'
@@ -175,6 +176,7 @@ class Message(models.Model):
         (BUZZ_INIT, 'buzz_init'),
         (BUZZ_CORRECT, 'buzz_correct'),
         (BUZZ_WRONG, 'buzz_wrong'),
+        (BUZZ_FORFEIT, 'buzz_forfeit'),
         (SET_CATEGORY, 'set_category'),
         (SET_DIFFICULTY, 'set_difficulty'),
         (RESET_SCORE, 'reset_score'),

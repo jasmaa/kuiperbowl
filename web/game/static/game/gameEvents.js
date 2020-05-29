@@ -25,10 +25,7 @@ $(document).ready(() => {
 });
 
 // Timed events
-window.setInterval(() => {
-  ping();
-  getPlayers();
-}, 5000);
+window.setInterval(ping, 5000);
 window.setInterval(update, 100);
 
 window.onbeforeunload = leave;

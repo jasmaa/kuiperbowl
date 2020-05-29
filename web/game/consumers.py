@@ -47,6 +47,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """Websocket receive
         """
         data = json.loads(text_data)
+        if 'content' not in data or data['content'] == None:
+            data['content'] = ''
+
         room = Room.objects.get(label=self.room_name)
 
         # Create new user and join room
@@ -55,8 +58,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             data['user_id'] = user.user_id
             await self.join(room, data)
 
-        # Abort if no user id supplied
-        if 'user_id' not in data:
+        # Abort if no user id or request type supplied
+        if 'user_id' not in data or 'request_type' not in data:
             return
 
         # Validate user
@@ -94,8 +97,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 await self.reset_score(room, data)
             elif data['request_type'] == 'chat':
                 await self.chat(room, data)
-            elif data['request_type'] == 'get_players':
-                await self.get_players(room, data)
             else:
                 pass
 
@@ -140,7 +141,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         create_message("join", user, None, room)
 
         await self.send_json(get_response_json(room))
-        await self.send_json(get_players_json(room, p))
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -303,9 +303,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         if p == None:
             return
 
-        if data['content'] == None:
-            data['content'] = ""
-
         if p.player_id == room.buzz_player.player_id:
 
             cleaned_content = clean_content(data['content'])
@@ -358,7 +355,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-        # Resume question if buzz time up
+        # Forfeit question if buzz time up
         elif datetime.datetime.now().timestamp() >= room.buzz_start_time + GRACE_TIME:
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'
@@ -367,7 +364,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             room.save()
 
             create_message(
-                "buzz_wrong",
+                "buzz_forfeit",
                 room.buzz_player.user,
                 None,
                 room,
@@ -514,16 +511,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def get_players(self, room, data):
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
-
-        await self.send_json(get_players_json(room, p))
-
 
 # === Helper methods ===
 
@@ -551,15 +538,7 @@ def get_response_json(room):
         "room_category": room.category,
         "messages": room.get_messages(),
         "difficulty": room.difficulty,
-    }
-
-
-def get_players_json(room, p):
-    """Generates JSON for players
-    """
-    return {
-        "response_type": "get_players",
-        "players": room.get_players(p),
+        "players": room.get_players(),
     }
 
 

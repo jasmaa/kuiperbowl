@@ -130,8 +130,70 @@ gamesock.onmessage = message => {
     question = data['current_question_content'];
     category = data['category'];
     messages = data['messages'];
+    players = data['players'];
 
-    // TODO: move messages to separate response type
+    // Update scoreboard
+    // TODO: Make it so we don't have to redo popover??
+    $('[data-toggle="popover"]').popover('hide')
+    scoreboard.innerHTML = '';
+    for (i = 0; i < players.length; i++) {
+      const icon = document.createElement('i');
+      icon.classList.add('fas');
+      icon.classList.add('fa-circle');
+      icon.style.margin = '0.5em';
+      icon.style.color = players[i]['active'] ? '#00ff00' : '#aaaaaa';
+
+      // Find last seen
+      const lastSeenDiff = Date.now() / 1000 - new Date(players[i]['last_seen']);
+      let lastSeenMessage = ''
+      if (lastSeenDiff < 1) {
+        lastSeenMessage = 'Now';
+      } else if (lastSeenDiff < 60) {
+        lastSeenMessage = `${Math.round(lastSeenDiff)} seconds ago`;
+      } else if (lastSeenDiff < 3600) {
+        lastSeenMessage = `${Math.round(lastSeenDiff / 60)} minutes ago`;
+      } else if (lastSeenDiff < 86400) {
+        lastSeenMessage = `${Math.round(lastSeenDiff / 3600)} hours ago`;
+      } else {
+        lastSeenMessage = 'Over a day ago';
+      }
+
+      const row = scoreboard.insertRow(icon);
+
+      const cell1 = row.insertCell();
+      cell1.append(icon);
+      cell1.append(players[i]['user_name']);
+      cell1.style = 'word-break: break-all;'
+
+      cell1.style.outline = 'none';
+      cell1.setAttribute('tabindex', 1)
+      cell1.setAttribute('data-toggle', 'popover');
+      cell1.setAttribute('data-trigger', 'hover');
+      cell1.setAttribute('title', players[i]['user_name']);
+      cell1.setAttribute('data-content', `
+        <table class="table">
+          <tbody>
+          <tr>
+            <td>Correct</td>
+            <td>${players[i]['correct']}</td>
+          </tr>
+          <tr>
+            <td>Negs</td>
+            <td>${players[i]['negs']}</td>
+          </tr>
+          <tr>
+            <td>Last Seen</td>
+            <td>${lastSeenMessage}</td>
+          </tr>
+        </tbody>
+        </table>
+      `);
+      $(cell1).popover({ html: true });
+
+      const cell2 = row.insertCell();
+      cell2.append(players[i]['score']);
+    }
+
     // Update messages
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
@@ -190,6 +252,9 @@ gamesock.onmessage = message => {
           break;
         case "buzz_wrong":
           msgHTML = `<strong>${user}</strong> has incorrectly answered <strong>${content}</strong>`;
+          break;
+        case "buzz_forfeit":
+          msgHTML = `<strong>${user}</strong> has forfeit the question`;
           break;
         case "set_category":
           msgHTML = `<strong>${user}</strong> has changed the category to <strong>${content}</strong>`;
@@ -260,71 +325,6 @@ gamesock.onmessage = message => {
       requestContentInput.focus();
     }, 1);
 
-  } else if (data['response_type'] === 'get_players') {
-
-    players = data['players'];
-
-    // Update scoreboard
-    // TODO: Make it so we don't have to redo popover??
-    $('[data-toggle="popover"]').popover('hide')
-    scoreboard.innerHTML = '';
-    for (i = 0; i < players.length; i++) {
-      const icon = document.createElement('i');
-      icon.classList.add('fas');
-      icon.classList.add('fa-circle');
-      icon.style.margin = '0.5em';
-      icon.style.color = players[i]['active'] ? '#00ff00' : '#aaaaaa';
-
-      // Find last seen
-      const lastSeenDiff = Date.now() / 1000 - new Date(players[i]['last_seen']);
-      let lastSeenMessage = ''
-      if (lastSeenDiff < 1) {
-        lastSeenMessage = 'Now';
-      } else if (lastSeenDiff < 60) {
-        lastSeenMessage = `${Math.round(lastSeenDiff)} seconds ago`;
-      } else if (lastSeenDiff < 3600) {
-        lastSeenMessage = `${Math.round(lastSeenDiff / 60)} minutes ago`;
-      } else if (lastSeenDiff < 86400) {
-        lastSeenMessage = `${Math.round(lastSeenDiff / 3600)} hours ago`;
-      } else {
-        lastSeenMessage = 'Over a day ago';
-      }
-
-      const row = scoreboard.insertRow(icon);
-
-      const cell1 = row.insertCell();
-      cell1.append(icon);
-      cell1.append(players[i]['user_name']);
-      cell1.style = 'word-break: break-all;'
-
-      cell1.style.outline = 'none';
-      cell1.setAttribute('tabindex', 1)
-      cell1.setAttribute('data-toggle', 'popover');
-      cell1.setAttribute('data-trigger', 'hover');
-      cell1.setAttribute('title', players[i]['user_name']);
-      cell1.setAttribute('data-content', `
-        <table class="table">
-          <tbody>
-          <tr>
-            <td>Correct</td>
-            <td>${players[i]['correct']}</td>
-          </tr>
-          <tr>
-            <td>Negs</td>
-            <td>${players[i]['negs']}</td>
-          </tr>
-          <tr>
-            <td>Last Seen</td>
-            <td>${lastSeenMessage}</td>
-          </tr>
-        </tbody>
-        </table>
-      `);
-      $(cell1).popover({ html: true });
-
-      const cell2 = row.insertCell();
-      cell2.append(players[i]['score']);
-    }
   }
 }
 
@@ -518,15 +518,5 @@ function resetScore() {
   gamesock.send(JSON.stringify({
     user_id: userID,
     request_type: "reset_score",
-  }));
-}
-
-/**
- * Gets players
- */
-function getPlayers() {
-  gamesock.send(JSON.stringify({
-    user_id: userID,
-    request_type: "get_players",
   }));
 }
