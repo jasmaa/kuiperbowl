@@ -11,8 +11,7 @@ class TestRoom:
 
     def test_get_scores(self):
         test_room = Room.objects.get(label='testroom')
-        test_player = test_room.players.first()
-        assert len(test_room.get_players(test_player)) == 1
+        assert len(test_room.get_players()) == 1
     
     def test_get_messages(self):
         test_room = Room.objects.get(label='testroom')
