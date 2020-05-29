@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Kuiperbowl - {{ room.label }}</title>
+<title>{{ room.label }} - Kuiperbowl</title>
 {% endblock %}
 
 {% block content %}
@@ -27,6 +27,11 @@
 </div>
 
 <div class="container">
+
+  <div id="ban-alert" class="alert alert-danger" style="display: none;">
+    You have been banned from this room.
+  </div>
+
   <div class="row">
     <div class="col">
       <input type="text" id="request-content" class="form-control" maxlength="200">

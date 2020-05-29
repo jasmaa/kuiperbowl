@@ -325,6 +325,9 @@ gamesock.onmessage = message => {
       requestContentInput.focus();
     }, 1);
 
+  } else if (data['response_type'] === "kick") {
+    gamesock.close();
+    banAlert.style = 'display: block;'
   }
 }
 

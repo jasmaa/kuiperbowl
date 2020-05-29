@@ -52,7 +52,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
         room = Room.objects.get(label=self.room_name)
 
-        # Create new user and join room
+        # Handle new user and join room
         if data['request_type'] == 'new_user':
             user = await self.new_user(room)
             data['user_id'] = user.user_id
@@ -68,35 +68,43 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             data['user_id'] = user.user_id
             await self.join(room, data)
 
-        # Join
+        # Handle join
         if data['request_type'] == 'join':
             await self.join(room, data)
             return
 
-        # Commands for joined players
-        if len(room.players.filter(user__user_id=data['user_id'])) == 1:
+        # Get player
+        p = room.players.filter(user__user_id=data['user_id']).first()
+        if p != None:
+
+            # Kick if banned user
+            if p.banned:
+                await self.kick()
+                return
+
+            # Handle requests for joined players
             if data['request_type'] == 'ping':
-                await self.ping(room, data)
+                await self.ping(room, p)
             elif data['request_type'] == 'leave':
-                await self.leave(room, data)
+                await self.leave(room, p)
             elif data['request_type'] == 'get_answer':
-                await self.get_answer(room, data)
+                await self.get_answer(room)
             elif data['request_type'] == 'set_name':
-                await self.set_name(room, data)
+                await self.set_name(room, p, data['content'])
             elif data['request_type'] == 'next':
-                await self.next(room, data)
+                await self.next(room)
             elif data['request_type'] == 'buzz_init':
-                await self.buzz_init(room, data)
+                await self.buzz_init(room, p)
             elif data['request_type'] == 'buzz_answer':
-                await self.buzz_answer(room, data)
+                await self.buzz_answer(room, p, data['content'])
             elif data['request_type'] == 'set_category':
-                await self.set_category(room, data)
+                await self.set_category(room, p, data['content'])
             elif data['request_type'] == 'set_difficulty':
-                await self.set_difficulty(room, data)
+                await self.set_difficulty(room, p, data['content'])
             elif data['request_type'] == 'reset_score':
-                await self.reset_score(room, data)
+                await self.reset_score(room, p)
             elif data['request_type'] == 'chat':
-                await self.chat(room, data)
+                await self.chat(room, p, data['content'])
             else:
                 pass
 
@@ -105,15 +113,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """
         await self.send_json(event['data'])
 
-    async def ping(self, room, data):
+    async def ping(self, room, p):
         """Receive ping
         """
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
 
         p.last_seen = datetime.datetime.now().timestamp()
         p.save()
@@ -150,14 +152,11 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def leave(self, room, data):
+    async def leave(self, room, p):
         """Leave room
         """
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
 
-        create_message("leave", user, None, room)
+        create_message("leave", p.user, None, room)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -179,18 +178,15 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
         return user
 
-    async def set_name(self, room, data):
+    async def set_name(self, room, p, content):
         """Update player name
         """
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
 
-        old_name = user.name
-        user.name = clean_content(data['content'])
+        old_name = p.user.name
+        p.user.name = clean_content(content)
         try:
-            user.full_clean()
-            user.save()
+            p.user.full_clean()
+            p.user.save()
 
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -203,7 +199,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         except ValidationError as e:
             return
 
-    async def next(self, room, data):
+    async def next(self, room):
         """Next question
         """
 
@@ -242,7 +238,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-    async def buzz_init(self, room, data):
+    async def buzz_init(self, room, p):
         """Initialize buzz
         """
 
@@ -252,14 +248,6 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
         # Abort if no current question
         if room.current_question == None:
-            return
-
-        # Get player
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
             return
 
         if not p.locked_out and room.state == 'playing':
@@ -285,7 +273,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-    async def buzz_answer(self, room, data):
+    async def buzz_answer(self, room, p, content):
 
         # Reject when not in contest
         if room.state != 'contest':
@@ -295,17 +283,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         if room.buzz_player == None or room.current_question == None:
             return
 
-        # Get player
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
-
         if p.player_id == room.buzz_player.player_id:
 
-            cleaned_content = clean_content(data['content'])
+            cleaned_content = clean_content(content)
 
             if judge_answer(cleaned_content, room.current_question.answer):
                 p.score += room.current_question.points
@@ -378,7 +358,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-    async def get_answer(self, room, data):
+    async def get_answer(self, room):
         """Get answer for room question
         """
 
@@ -408,21 +388,18 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-    async def set_category(self, room, data):
+    async def set_category(self, room, p, content):
         """Set room category
         """
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
 
         try:
-            room.category = clean_content(data['content'])
+            room.category = clean_content(content)
             room.full_clean()
             room.save()
 
             create_message(
                 "set_category",
-                user,
+                p.user,
                 room.category,
                 room,
             )
@@ -436,21 +413,18 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         except ValidationError as e:
             pass
 
-    async def set_difficulty(self, room, data):
+    async def set_difficulty(self, room, p, content):
         """Set room difficulty
         """
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
 
         try:
-            room.difficulty = clean_content(data['content'])
+            room.difficulty = clean_content(content)
             room.full_clean()
             room.save()
 
             create_message(
                 "set_difficulty",
-                user,
+                p.user,
                 room.difficulty,
                 room,
             )
@@ -464,17 +438,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         except ValidationError as e:
             pass
 
-    async def reset_score(self, room, data):
+    async def reset_score(self, room, p):
         """Reset player score
         """
-
-        # Get player
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
 
         p.score = 0
         p.save()
@@ -488,19 +454,11 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def chat(self, room, data):
+    async def chat(self, room, p, content):
         """ Send chat message
         """
 
-        # Get player
-        user = User.objects.filter(user_id=data['user_id']).first()
-        if user == None:
-            return
-        p = user.players.filter(room=room).first()
-        if p == None:
-            return
-
-        m = clean_content(data['content'])
+        m = clean_content(content)
 
         create_message("chat", p.user, m, room)
         await self.channel_layer.group_send(
@@ -509,6 +467,17 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'update_room',
                 'data': get_response_json(room),
             }
+        )
+
+    async def kick(self):
+        """Kick banned player
+        """
+        await self.send_json({
+            "response_type": "kick",
+        })
+        await self.channel_layer.group_discard(
+            self.room_name,
+            self.channel_name
         )
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 import datetime
 
@@ -101,7 +102,12 @@ class Room(models.Model):
 
     def get_players(self):
         player_list = []
-        for player in self.players.filter(last_seen__gte=datetime.datetime.now().timestamp() - 3600):
+
+        valid_players = self.players.filter(
+            Q(last_seen__gte=datetime.datetime.now().timestamp() - 3600) &
+            Q(banned=False)
+        )
+        for player in valid_players:
             active = datetime.datetime.now().timestamp() - player.last_seen < 10
 
             player_list.append({
@@ -151,10 +157,11 @@ class Player(models.Model):
     correct = models.IntegerField(default=0)
     negs = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
-
     banned = models.BooleanField(default=False)
-
     last_seen = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.user.name + ":" + self.room.label
 
 
 class Message(models.Model):

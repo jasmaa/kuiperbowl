@@ -17,6 +17,7 @@ const nextBtn = document.getElementById('next-btn');
 const buzzBtn = document.getElementById('buzz-btn');
 const chatBtn = document.getElementById('chat-btn');
 const resetBtn = document.getElementById('reset-btn');
+const banAlert = document.getElementById('ban-alert');
 
 // Init tooltip and popover
 $(document).ready(() => {
