@@ -123,12 +123,14 @@ class Room(models.Model):
 
     def get_messages(self):
 
+        valid_messages = self.messages.filter(visible=True)
+
         chrono_messages = [{
             'message_id': m.message_id,
             'tag': m.tag,
-            'user_name': m.user.name,
+            'user_name': m.player.user.name,
             'content': m.content
-        } for m in self.messages.order_by('timestamp').reverse()[:50]]
+        } for m in valid_messages.order_by('timestamp').reverse()[:50]]
 
         return chrono_messages
 
@@ -162,7 +164,15 @@ class Player(models.Model):
     negs = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
     banned = models.BooleanField(default=False)
+    reported_by = models.ManyToManyField('Player')
     last_seen = models.FloatField(default=0)
+
+    def unban(self):
+        """Unban player
+        """
+        self.banned = False
+        self.reported_by.all().delete()
+        self.save()
 
     def __str__(self):
         return self.user.name + ":" + self.room.label
@@ -200,11 +210,15 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         related_name='messages',
     )
-    user = models.ForeignKey(
-        User,
+    player = models.ForeignKey(
+        Player,
         on_delete=models.CASCADE,
         related_name='messages',
     )
     content = models.CharField(max_length=200, null=True, blank=True)
     tag = models.CharField(max_length=20, choices=message_tags)
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+    visible = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.player.user.name + "(" + self.tag + ")" ":" + self.content

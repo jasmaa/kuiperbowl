@@ -283,7 +283,7 @@ gamesock.onmessage = message => {
       reportBtn.className = 'btn btn-sm';
       reportBtn.innerHTML = `<i class="fas fa-flag" style="color: gray;"></i>`;
       reportBtn.onclick = () => {
-        const res = confirm('Report this message?');
+        const res = confirm('Report the player that wrote this message?');
         if (res) {
           reportMessage(messageID);
         }

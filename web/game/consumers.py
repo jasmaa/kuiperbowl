@@ -142,7 +142,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         if p == None:
             p = Player.objects.create(room=room, user=user)
 
-        create_message("join", user, None, room)
+        create_message("join", p, None, room)
 
         await self.send_json(get_response_json(room))
 
@@ -158,7 +158,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         """Leave room
         """
 
-        create_message("leave", p.user, None, room)
+        create_message("leave", p, None, room)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -262,7 +262,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             p.locked_out = True
             p.save()
 
-            create_message("buzz_init", p.user, None, room)
+            create_message("buzz_init", p, None, room)
 
             await self.send_json({
                 'response_type': 'buzz_grant',
@@ -300,7 +300,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
                 create_message(
                     "buzz_correct",
-                    p.user,
+                    p,
                     cleaned_content,
                     room,
                 )
@@ -313,7 +313,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
                 create_message(
                     "buzz_wrong",
-                    p.user,
+                    p,
                     cleaned_content,
                     room,
                 )
@@ -347,7 +347,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
             create_message(
                 "buzz_forfeit",
-                room.buzz_player.user,
+                room.buzz_player,
                 None,
                 room,
             )
@@ -401,7 +401,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
             create_message(
                 "set_category",
-                p.user,
+                p,
                 room.category,
                 room,
             )
@@ -426,7 +426,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
             create_message(
                 "set_difficulty",
-                p.user,
+                p,
                 room.difficulty,
                 room,
             )
@@ -447,7 +447,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
         p.score = 0
         p.save()
 
-        create_message("reset_score", p.user, None, room)
+        create_message("reset_score", p, None, room)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -462,7 +462,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
         m = clean_content(content)
 
-        create_message("chat", p.user, m, room)
+        create_message("chat", p, m, room)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -481,11 +481,24 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             self.room_name,
             self.channel_name
         )
-    
-    async def report_message(self, room, p, message_id):
-        print(room, p, message_id)
-        pass
 
+    async def report_message(self, room, p, message_id):
+        """Handle reporting messages
+        """
+        m = room.messages.filter(message_id=message_id).first()
+        if m == None:
+            return
+
+        # Only report chat or buzz messages
+        if m.tag == 'chat' or m.tag == 'buzz_correct' or m.tag == 'buzz_wrong':
+            m.player.reported_by.add(p)
+            m.save()
+
+            # Ban if reported by 60% of players
+            ratio = len(m.player.reported_by.all()) / len(room.players.all())
+            if ratio > 0.6:
+                m.player.banned = True
+                m.player.save()
 
 # === Helper methods ===
 
@@ -517,11 +530,11 @@ def get_response_json(room):
     }
 
 
-def create_message(tag, user, content, room):
+def create_message(tag, p, content, room):
     """Adds a message to db
     """
     try:
-        m = Message(tag=tag, user=user, content=content, room=room)
+        m = Message(tag=tag, player=p, content=content, room=room)
         m.full_clean()
         m.save()
     except ValidationError as e:
