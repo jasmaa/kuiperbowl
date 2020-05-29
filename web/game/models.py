@@ -171,7 +171,7 @@ class Player(models.Model):
         """Unban player
         """
         self.banned = False
-        self.reported_by.all().delete()
+        self.reported_by.clear()
         self.save()
 
     def __str__(self):

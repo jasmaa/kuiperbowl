@@ -27,3 +27,4 @@ class TestRoom:
         banned_player.unban()
         assert not banned_player.banned
         assert banned_player.reported_by.count() == 0
+        assert test_room.players.count() == 3
