@@ -2,11 +2,11 @@
 /**
  * Get user data from cookie
  */
-function retrieve_userdata(){
+function retrieveUserdata(){
   const prefs = cookieToDict(document.cookie);
-  user_name = prefs['user_name'];
-  user_id = prefs['user_id'];
-  locked_out = prefs['locked_out'] === 'true';
+  username = prefs['user_name'];
+  userID = prefs['user_id'];
+  lockedOut = prefs['locked_out'] === 'true';
 }
 
 /**
@@ -15,7 +15,7 @@ function retrieve_userdata(){
  * @param {*} val 
  */
 function setCookie(name, val){
-  document.cookie = `${name}=${val}; path=/`;
+  document.cookie = `${name}=${val}; path=/; SameSite=Strict`;
 }
 
 /**
@@ -25,7 +25,7 @@ function setCookie(name, val){
  * @param {*} path 
  */
 function setCookieAndPath(name, val, path){
-  document.cookie = `${name}=${val}; path=${path}`;
+  document.cookie = `${name}=${val}; path=${path}; SameSite=Strict`;
 }
 
 /**
