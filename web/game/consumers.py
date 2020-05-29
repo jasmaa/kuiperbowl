@@ -105,6 +105,8 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
                 await self.reset_score(room, p)
             elif data['request_type'] == 'chat':
                 await self.chat(room, p, data['content'])
+            elif data['request_type'] == 'report_message':
+                await self.report_message(room, p, data['content'])
             else:
                 pass
 
@@ -479,6 +481,10 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
             self.room_name,
             self.channel_name
         )
+    
+    async def report_message(self, room, p, message_id):
+        print(room, p, message_id)
+        pass
 
 
 # === Helper methods ===

@@ -9,6 +9,7 @@ import datetime
 class Question(models.Model):
     """Quizbowl current_question"""
 
+    question_id = models.AutoField(primary_key=True)
     category = models.TextField(default="Everything")
     points = models.IntegerField()
     content = models.TextField()
@@ -101,31 +102,34 @@ class Room(models.Model):
         return self.label
 
     def get_players(self):
-        player_list = []
 
         valid_players = self.players.filter(
             Q(last_seen__gte=datetime.datetime.now().timestamp() - 3600) &
             Q(banned=False)
         )
-        for player in valid_players:
-            active = datetime.datetime.now().timestamp() - player.last_seen < 10
 
-            player_list.append({
-                'user_name': player.user.name,
-                'player_id': player.player_id,
-                'score': player.score,
-                'correct': player.correct,
-                'negs': player.negs,
-                'last_seen': player.last_seen,
-                'active': active,
-            })
+        player_list = [{
+            'user_name': player.user.name,
+            'player_id': player.player_id,
+            'score': player.score,
+            'correct': player.correct,
+            'negs': player.negs,
+            'last_seen': player.last_seen,
+            'active': datetime.datetime.now().timestamp() - player.last_seen < 10,
+        } for player in valid_players]
+
         player_list.sort(key=lambda player: player['score'])
         return player_list
 
     def get_messages(self):
-        chrono_messages = []
-        for m in self.messages.order_by('timestamp').reverse()[:50]:
-            chrono_messages.append((m.tag, m.user.name, m.content))
+
+        chrono_messages = [{
+            'message_id': m.message_id,
+            'tag': m.tag,
+            'user_name': m.user.name,
+            'content': m.content
+        } for m in self.messages.order_by('timestamp').reverse()[:50]]
+
         return chrono_messages
 
 
@@ -190,6 +194,7 @@ class Message(models.Model):
         (CHAT, 'chat'),
     )
 
+    message_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(
         Room,
         on_delete=models.CASCADE,

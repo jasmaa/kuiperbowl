@@ -198,13 +198,11 @@ gamesock.onmessage = message => {
     messageSpace.innerHTML = '';
     for (i = 0; i < messages.length; i++) {
 
-      const [tag, user, content] = messages[i];
-
       const icon = document.createElement('i');
       let msgHTML;
 
       icon.style.margin = '0.5em';
-      switch (tag) {
+      switch (messages[i]['tag']) {
         case "buzz_correct":
           icon.classList.add('far');
           icon.classList.add('fa-circle');
@@ -237,48 +235,73 @@ gamesock.onmessage = message => {
           break;
       }
 
-      switch (tag) {
+      switch (messages[i]['tag']) {
         case "join":
-          msgHTML = `<strong>${user}</strong> has joined the room`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has joined the room`;
           break;
         case "leave":
-          msgHTML = `<strong>${user}</strong> has left the room`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has left the room`;
           break;
         case "buzz_init":
-          msgHTML = `<strong>${user}</strong> has buzzed`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has buzzed`;
           break;
         case "buzz_correct":
-          msgHTML = `<strong>${user}</strong> has correctly answered <strong>${content}</strong>`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has correctly answered <strong>${messages[i]['content']}</strong>`;
           break;
         case "buzz_wrong":
-          msgHTML = `<strong>${user}</strong> has incorrectly answered <strong>${content}</strong>`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has incorrectly answered <strong>${messages[i]['content']}</strong>`;
           break;
         case "buzz_forfeit":
-          msgHTML = `<strong>${user}</strong> has forfeit the question`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has forfeit the question`;
           break;
         case "set_category":
-          msgHTML = `<strong>${user}</strong> has changed the category to <strong>${content}</strong>`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has changed the category to <strong>${messages[i]['content']}</strong>`;
           break;
         case "set_difficulty":
-          msgHTML = `<strong>${user}</strong> has changed the difficulty to <strong>${content}</strong>`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has changed the difficulty to <strong>${messages[i]['content']}</strong>`;
           break;
         case "reset_score":
-          msgHTML = `<strong>${user}</strong> has reset their score`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong> has reset their score`;
           break;
         case "chat":
-          msgHTML = `<strong>${user}</strong>: ${content}`;
+          msgHTML = `<strong>${messages[i]['user_name']}</strong>: ${messages[i]['content']}`;
           break;
+      }
+
+      const msg = document.createElement('div');
+      msg.innerHTML = msgHTML;
+
+      const leftSide = document.createElement('div');
+      leftSide.style.display = 'flex';
+      leftSide.style.alignItems = 'center';
+      leftSide.append(icon);
+      leftSide.append(msg);
+
+      const messageID = messages[i]['message_id'];
+      const reportBtn = document.createElement('div');
+      reportBtn.title = 'Flag as inappropriate'
+      reportBtn.className = 'btn btn-sm';
+      reportBtn.innerHTML = `<i class="fas fa-flag" style="color: gray;"></i>`;
+      reportBtn.onclick = () => {
+        const res = confirm('Report this message?');
+        if (res) {
+          reportMessage(messageID);
+        }
       }
 
       const li = document.createElement('li');
       li.classList.add('list-group-item');
       li.style.display = 'flex';
-      li.style.flexDirection = 'row';
+      li.style.justifyContent = 'space-between';
       li.style.alignItems = 'center';
-      li.append(icon);
-      const msg = document.createElement('div');
-      msg.innerHTML = msgHTML;
-      li.append(msg);
+      li.append(leftSide);
+
+      if (messages[i]['tag'] === 'chat' ||
+        messages[i]['tag'] === 'buzz_correct' ||
+        messages[i]['tag'] === 'buzz_wrong') {
+        li.append(reportBtn);
+      }
+
       messageSpace.append(li);
     }
 
@@ -521,5 +544,17 @@ function resetScore() {
   gamesock.send(JSON.stringify({
     user_id: userID,
     request_type: "reset_score",
+  }));
+}
+
+/**
+ * Report message
+ * @param {*} messageID 
+ */
+function reportMessage(messageID) {
+  gamesock.send(JSON.stringify({
+    user_id: userID,
+    request_type: "report_message",
+    content: messageID,
   }));
 }
