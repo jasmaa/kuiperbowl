@@ -24,6 +24,7 @@ let category;
 let currQuestionContent;
 let players;
 let messages;
+let changeLocked = false;
 
 // Set up client
 gamesock.onopen = () => {
@@ -131,6 +132,11 @@ gamesock.onmessage = message => {
     category = data['category'];
     messages = data['messages'];
     players = data['players'];
+    changeLocked = data['change_locked'];
+
+    // Update change widgets
+    categorySelect.disabled = changeLocked;
+    difficultySelect.disabled = changeLocked;
 
     // Update scoreboard
     // TODO: Make it so we don't have to redo popover??

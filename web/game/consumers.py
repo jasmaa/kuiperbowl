@@ -393,6 +393,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
     async def set_category(self, room, p, content):
         """Set room category
         """
+        # Abort if change locked
+        if room.change_locked:
+            return
 
         try:
             room.category = clean_content(content)
@@ -418,6 +421,9 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
     async def set_difficulty(self, room, p, content):
         """Set room difficulty
         """
+        # Abort if change locked
+        if room.change_locked:
+            return
 
         try:
             room.difficulty = clean_content(content)
@@ -502,6 +508,7 @@ class QuizbowlConsumer(AsyncJsonWebsocketConsumer):
 
 # === Helper methods ===
 
+
 def update_time_state(room):
     """Checks time and updates state
     """
@@ -527,6 +534,7 @@ def get_response_json(room):
         "messages": room.get_messages(),
         "difficulty": room.difficulty,
         "players": room.get_players(),
+        "change_locked": room.change_locked,
     }
 
 
