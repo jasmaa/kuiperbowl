@@ -1,0 +1,65 @@
+[
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "hs",
+            "category": "Everything",
+            "difficulty": "HS",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "ms",
+            "category": "Everything",
+            "difficulty": "MS",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "college",
+            "category": "Everything",
+            "difficulty": "College",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "history",
+            "category": "History",
+            "difficulty": "HS",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "science",
+            "category": "Science",
+            "difficulty": "HS",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "literature",
+            "category": "Literature",
+            "difficulty": "HS",
+            "change_locked": true
+        }
+    },
+    {
+        "model": "game.room",
+        "fields": {
+            "label": "trash",
+            "category": "Trash",
+            "difficulty": "HS",
+            "change_locked": true
+        }
+    }
+]

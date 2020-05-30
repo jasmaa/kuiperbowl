@@ -97,6 +97,7 @@ class Room(models.Model):
         choices=difficulties,
         default=HS,
     )
+    change_locked = models.BooleanField(default=False) # Category and difficulty changes locked
 
     def __str__(self):
         return self.label

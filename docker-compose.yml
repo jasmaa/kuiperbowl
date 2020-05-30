@@ -24,6 +24,7 @@ services:
     command: bash -c "
       python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
+      python manage.py loaddata fixtures/default_rooms.json &&
       daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:application"
 
   redis:
