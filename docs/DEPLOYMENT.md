@@ -24,7 +24,7 @@ Clone repository:
 
     git clone https://github.com/jasmaa/kuiperbowl.git
 
-Create a `.env` file from `sample.env` in repository root and configure with proper credentials.
+Create a `.env` file from `.env.development` in repository root and configure with proper credentials.
 
 ### Set up database
 

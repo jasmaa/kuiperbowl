@@ -8,7 +8,7 @@ Real-time multiplayer quizbowl
 
 ## Local Development
 
-Create `.env` from `sample.env` in repsitory root and configure with proper credentials.
+Create `.env` from `.env.development` in repsitory root and configure with proper credentials.
 
 Set up a virtual environment if desired and run:
 
@@ -36,7 +36,7 @@ or custom made. See `fixtures/sample.json` for an example custom fixture.
 
 ### Set Up and Run
 
-Create `.env` from `sample.env` in repsitory root and configure with proper credentials.
+Create `.env` from `.env.development` in repsitory root and configure with proper credentials.
 
 Start application:
 
