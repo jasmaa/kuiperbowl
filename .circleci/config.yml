@@ -8,6 +8,9 @@ jobs:
       - setup_remote_docker
 
       - run:
+          name: Clear volumes
+          command: docker volume rm kuiperbowl_pgdata kuiperbowl_redisdata kuiperbowl_web-static
+      - run:
           name: Build docker-compose containers
           command: docker-compose -f docker-compose-dev.yml build
       - run:
