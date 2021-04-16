@@ -18,9 +18,13 @@
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 
-### Clone repository
+### Set up repository
+
+Clone repository:
 
     git clone https://github.com/jasmaa/kuiperbowl.git
+
+Create a `.env` file from `sample.env` in repository root and configure with proper credentials.
 
 ### Set up database
 
