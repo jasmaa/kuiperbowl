@@ -23,8 +23,6 @@ services:
     env_file: .env
     command: bash -c "
       python manage.py collectstatic --noinput --clear &&
-      python manage.py migrate &&
-      python manage.py loaddata fixtures/default_rooms.json &&
       daphne -b 0.0.0.0 -p 8000 quizbowl.asgi:application"
 
   redis:
@@ -38,8 +36,10 @@ services:
     image: postgres:latest
     expose:
       - 5432
+    env_file: .env
     environment: 
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
       - pgdata:/var/lib/postgresql/data/
 

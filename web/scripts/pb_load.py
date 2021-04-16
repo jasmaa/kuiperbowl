@@ -8,7 +8,7 @@ def convert():
 
     # Download archive
     print("Downloading archive...")
-    urllib.request.urlretrieve("https://github.com/neotenic/database-dumps/raw/master/protobowl-qb-04-11-2017.json.xz", "input.json.xz")
+    urllib.request.urlretrieve("https://github.com/jasmaa/database-dumps/raw/master/2019-10-15-ALL.json.xz", "input.json.xz")
 
     # Parse and convert
     print("Converting...")
@@ -18,9 +18,8 @@ def convert():
         for i, entry in enumerate(data.split('\n')):
 
             entry = json.loads(entry)
-
             # Only keep entries with curlies
-            if '{' in entry['answer'] and '}' in entry['answer']:
+            if 'answer' in entry and '{' in entry['answer'] and '}' in entry['answer']:
                 output.append({
                     "model": "game.question",
                     "pk": i+1,
@@ -35,7 +34,7 @@ def convert():
 
     with open('./fixtures/pbdump.json', 'w') as f:
         json.dump(output, f)
-        print("Created /fixtures/pbdump.json")
+        print("Created fixtures/pbdump.json")
 
     # Remove archive
     os.remove("input.json.xz")

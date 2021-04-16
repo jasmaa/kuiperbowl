@@ -8,12 +8,21 @@ Real-time multiplayer quizbowl
 
 ## Local Development
 
+Configure `.env` with proper credentials.
+
 Set up a virtual environment if desired and run:
 
-    pip install -r "web/requirements.txt"
-    python web/manage.py runserver
+    cd web
+
+    pip install -r "requirements.txt"
+    python manage.py migrate
+    python manage.py loaddata fixtures/default_rooms.json
+    python manage.py loaddata fixtures/sample.json
+
+    python manage.py runserver
 
 ## Entering Tossup Data
+
 Tossup questions can be loaded easily from a fixture. Data can be downloaded
 from the [Protobowl DB dumps repo](https://github.com/neotenic/database-dumps)
 or custom made. See `fixtures/sample.json` for an example custom fixture.
@@ -25,15 +34,18 @@ or custom made. See `fixtures/sample.json` for an example custom fixture.
 
 ## Using Docker
 
-### Setup and Run
+### Set Up and Run
+
+Configure `.env` with proper credentials.
+
+Start application:
+
     docker-compose up --build
 
-    # Get the ip for the app
-    docker-machine ip
-
 ### Loading Data
+
     # Get container name of kuiperbowl_web
     docker ps
 
-    docker exec -it [container name] bash
-    python /usr/src/app/manage.py loaddata [fixture path]
+    docker exec -it <CONTAINER ID> bash
+    python /usr/src/app/manage.py loaddata <FIXTURE PATH>
