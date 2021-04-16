@@ -9,7 +9,7 @@ jobs:
 
       - run:
           name: Build docker-compose containers
-          command: docker-compose -f docker-compose-dev.yml build
+          command: docker-compose build
       - run:
           name: Test containers
-          command: docker-compose -f docker-compose-dev.yml run --rm web pytest
+          command: docker-compose run --rm web pytest
