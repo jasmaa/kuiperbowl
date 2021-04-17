@@ -8,7 +8,7 @@ def convert():
 
     # Download archive
     print("Downloading archive...")
-    urllib.request.urlretrieve("https://github.com/jasmaa/database-dumps/raw/master/2019-10-15-ALL.json.xz", "input.json.xz")
+    urllib.request.urlretrieve("https://github.com/jasmaa/database-dumps/raw/master/2017-04-11-QUIZBOWL.json.xz", "input.json.xz")
 
     # Parse and convert
     print("Converting...")
