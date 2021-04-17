@@ -28,6 +28,7 @@ def convert():
                         "points": 20,
                         "content": entry['question'],
                         "answer": entry['answer'],
+                        "difficulty": entry['difficulty'],
                         "duration": len(entry['question']) / 30,
                     }
                 })

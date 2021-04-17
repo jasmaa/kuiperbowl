@@ -33,13 +33,9 @@ Start application:
 
     sudo docker-compose up --build -d
 
-Get container id of `kuiperbowl_web`:
-
-    sudo docker ps
-
 Get a shell into running web process:
 
-    sudo docker exec -it <CONTAINER ID> bash
+    sudo docker exec -it kuiperbowl_web_1 bash
 
 Bootstrap database within the container:
 
