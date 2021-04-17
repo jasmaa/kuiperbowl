@@ -12,6 +12,7 @@
     sudo yum update -y
 
     sudo yum install git docker -y
+    sudo service docker start
 	
     sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
@@ -40,7 +41,7 @@ Get a shell into running web process:
 
     sudo docker exec -it <CONTAINER ID> bash
 
-Bootstrap database:
+Bootstrap database within the container:
 
     # Download and convert Protobowl question dumps
     python ./scripts/pb_load.py
@@ -50,6 +51,35 @@ Bootstrap database:
     python manage.py loaddata fixtures/default_rooms.json
     python manage.py loaddata fixtures/pbdump.json # This will take a while
 
+Exit container and shutdown application:
+
+    exit
+    sudo docker-compose down
+
 ### Launch application
 
     sudo docker-compose up --build -d
+
+
+## Set Up Networking
+
+### Create Load Balancer
+
+- Create an Application Load Balancer
+
+- Configure Load Balancer
+  - Add HTTP and HTTPS to Listeners.
+
+- Configure Security Groups
+  - Create/Add security group with inbound rules allowing all IPv4 and IPv6.
+    - `80`, `0.0.0.0/0`
+    - `80`, `::/0`
+    - `443`, `0.0.0.0/0`
+    - `443`, `::/0`
+
+- Register Targets
+  - Create target group listening on the previously set up EC2 instance.
+
+### Set Up DNS with Route 53
+
+- Add an `A` record pointing the domain name to the load balancer in the domain's hosted zone.
