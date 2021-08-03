@@ -1,4 +1,6 @@
-# Deployment
+# AWS Deployment
+
+Deployment instructions using Docker on AWS.
 
 ## Deploy on EC2
 
