@@ -1,7 +1,5 @@
 # Kuiperbowl
 
-[![CircleCI](https://circleci.com/gh/jasmaa/kuiperbowl.svg?style=svg)](https://circleci.com/gh/jasmaa/kuiperbowl)
-
 Real-time multiplayer quizbowl
 
 ![Comet logo](docs/comet.png)
