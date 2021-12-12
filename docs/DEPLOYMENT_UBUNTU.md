@@ -146,3 +146,18 @@ Enable auto-renewal:
 ```
 sudo systemctl status certbot.timer
 ```
+
+
+## Set up daily reboot
+
+Edit crontab with:
+
+```
+crontab -e
+```
+
+And add:
+
+```
+0 0 * * * reboot
+```
