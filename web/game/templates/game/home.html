@@ -7,7 +7,6 @@
 
 {% block content %}
 <div class="container">
-  <br>
   <div class="jumbotron">
 
     <h1 class="display-4">Welcome to Kuiperbowl</h1>
@@ -17,11 +16,9 @@
       To play, please join one of the default rooms below, or you can make your own by typing in the field.
     </p>
 
-    <br>
     <div class="container">
-
       <div style="margin-left: 20%; margin-right: 20%; text-align: center;">
-        <div>
+        <div class="mt-5">
           <a class="btn btn-secondary m-1" href="/game/hs">hs</a>
           <a class="btn btn-secondary m-1" href="/game/ms">ms</a>
           <a class="btn btn-secondary m-1" href="/game/college">college</a>
@@ -31,13 +28,15 @@
           <a class="btn btn-secondary m-1" href="/game/trash">trash</a>
         </div>
 
-        <form id="landing-form" class="m-5 needs-validation" novalidate>
+        <form id="landing-form" class="mt-5 needs-validation" novalidate>
           <div class="form-row">
             <div class="input-group">
               <input id="landing-content" type="text" class="form-control" placeholder="awesome-room">
               <div class="input-group-append">
-                <button id="landing-btn" class="btn btn-success" type="button">Go!</button>
+                <button id="landing-btn" class="btn btn-success rounded-right" type="button">Go!</button>
               </div>
+              <!-- invalid-feedback needs to be sibling of input -->
+              <!-- See: https://github.com/twbs/bootstrap/issues/23454 -->
               <div class="invalid-feedback">
                 Please enter a valid room name. Only the characters 'a-z', '-', and '_' are valid.
               </div>
