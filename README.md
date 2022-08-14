@@ -2,7 +2,7 @@
 
 Real-time multiplayer quizbowl
 
-![Comet logo](docs/comet.png)
+![Quizbowl game page](docs/game.png)
 
 ## Local Development
 
