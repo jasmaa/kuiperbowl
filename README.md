@@ -12,7 +12,7 @@ Install PostgreSQL. One quick and dirty way to install postgres is with:
 conda install anaconda::postgresql
 ```
 
-Ensure you initialize the desired file system location of the database cluster with the -D option. By default `/usr/local/pgsql/data`. 
+Ensure you initialize the desired file system location of the database cluster with the -D option. By default `/usr/local/pgsql/data`, but you might run into issues using WSL if you don't use a home subdirectory. 
 ```
 mkdir datadir
 pg_ctl -D datadir initdb
