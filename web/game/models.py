@@ -47,6 +47,7 @@ class Question(models.Model):
         AI = "ai", _("AI-generated")
 
     question_id = models.AutoField(primary_key=True)
+    group_id = models.IntegerField()
     category = models.TextField(default=Category.EVERYTHING)
     content = models.TextField()
     answer = models.TextField()
