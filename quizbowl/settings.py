@@ -90,9 +90,6 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DEFAULT_DATABASE = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': 'db.sqlite3',
-} if DEBUG else {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
     'NAME': os.getenv('DB_NAME', 'postgres'),
     'USER': os.getenv('DB_USER', 'postgres'),
