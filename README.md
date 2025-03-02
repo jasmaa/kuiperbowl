@@ -8,20 +8,28 @@ Real-time multiplayer quizbowl
 
 Install and run [PostgreSQL](https://www.postgresql.org/) and [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) servers.
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/).
+
 Configure `.env` from `sample.env` with proper credentials.
 
-Set up a virtual environment if desired and run:
+Set up a virtual environment if desired:
 
 ```bash
-python -m venv venv
-source venv/bin/activate
+uv venv
+source .venv/bin/activate
+```
 
-pip install uv
+Set up database:
 
+```bash
 uv run manage.py migrate
 uv run manage.py loaddata fixtures/default_rooms.json
 uv run manage.py loaddata fixtures/sample.json
+```
 
+Run dev server:
+
+```bash
 uv run manage.py runserver
 ```
 
