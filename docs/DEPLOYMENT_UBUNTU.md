@@ -21,7 +21,7 @@ ALTER USER postgres PASSWORD '<INSERT DB PASS>';
 Create database:
 
 ```bash
-sudo -u postgres createdb <INSERT DB NAME>
+sudo -u postgres createdb kuiperbowl
 ```
 
 
@@ -42,12 +42,17 @@ git clone https://github.com/jasmaa/kuiperbowl.git
 cd kuiperbowl
 ```
 
+Install UV:
+
+```bash
+export UV_INSTALL_DIR="/usr/local/bin/uv"
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 Install Python dependencies:
 
 ```bash
 apt-get install python3-pip python-is-python3
-
-pip install uv
 ```
 
 Create `.env` from `sample.env` and populate with credentials.
@@ -87,7 +92,11 @@ Install Nginx:
 sudo apt install nginx
 ```
 
-Copy `docs/kuiperbowl_nginx.conf` into `etc/nginx/sites-available`.
+Copy `docs/kuiperbowl_nginx.conf` into `/etc/nginx/sites-available`.
+
+```bash
+cp docs/kuiperbowl_nginx.conf /etc/nginx/sites-available/kuiperbowl_nginx.conf
+```
 
 Symlink to sites enabled:
 
@@ -101,19 +110,31 @@ Restart Nginx:
 sudo systemctl restart nginx
 ```
 
-
 ## Set up web systemd service
 
-Copy `docs/kuiperbowl.service` into `/etc/systemd/system`.
+Copy `docs/kuiperbowl.service` into `/etc/systemd/system`:
+
+```bash
+cp docs/kuiperbowl.service /etc/systemd/system/kuiperbowl.service
+```
 
 Reload systemd and start server with:
 
 ```bash
-systemctl daemon-reload
-systemctl enable kuiperbowl.service
-systemctl start kuiperbowl.service
+sudo systemctl daemon-reload
+sudo systemctl enable kuiperbowl.service
+sudo systemctl start kuiperbowl.service
 ```
 
+Check status of service with:
+
+```bash
+sudo systemctl status kuiperbowl.service
+
+# or
+
+sudo journalctl -u kuiperbowl.service | tail
+```
 
 ## Set up DNS
 
