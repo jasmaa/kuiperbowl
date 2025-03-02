@@ -89,17 +89,21 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASS', 'postgres'),
-        'HOST': os.getenv('DB_SERVICE', 'localhost'),
-        'PORT': int(os.getenv('DB_PORT', '5432')),
-    }
+DEFAULT_DATABASE = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': 'db.sqlite3',
+} if DEBUG else {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': os.getenv('DB_NAME', 'postgres'),
+    'USER': os.getenv('DB_USER', 'postgres'),
+    'PASSWORD': os.getenv('DB_PASS', 'postgres'),
+    'HOST': os.getenv('DB_SERVICE', 'localhost'),
+    'PORT': int(os.getenv('DB_PORT', '5432')),
 }
 
+DATABASES = {
+    'default': DEFAULT_DATABASE,
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
