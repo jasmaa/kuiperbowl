@@ -1,8 +1,6 @@
 import pytest
 
-from .models import *
-from django.core.management import call_command
-
+from ..models import *
 
 @pytest.fixture(scope='session')
 def django_db_setup(django_db_setup, django_db_blocker):
@@ -29,15 +27,15 @@ def django_db_setup(django_db_setup, django_db_blocker):
 
         # === Users ===
         user_chad = User.objects.create(
-            user_id=1,
+            user_id="1",
             name="chad"
         )
         user_vivian = User.objects.create(
-            user_id=2,
+            user_id="2",
             name="vivian",
         )
         user_jesus = User.objects.create(
-            user_id=3,
+            user_id="3",
             name="jesus",
         )
 
