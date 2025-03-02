@@ -277,7 +277,6 @@ class QuizbowlConsumer(JsonWebsocketConsumer):
             )
 
     def buzz_answer(self, room, p, content):
-
         # Reject when not in contest
         if room.state != 'contest':
             return
@@ -287,15 +286,18 @@ class QuizbowlConsumer(JsonWebsocketConsumer):
             return
 
         if p.player_id == room.buzz_player.player_id:
-
             cleaned_content = clean_content(content)
 
+            # Answer is correct
             if judge_answer(cleaned_content, room.current_question.answer):
                 p.score += room.current_question.points
                 p.correct += 1
                 p.save()
 
                 # Quick end question
+                buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+                room.state = 'playing'
+                room.start_time += buzz_duration
                 room.end_time = room.start_time
                 room.save()
 
@@ -305,8 +307,10 @@ class QuizbowlConsumer(JsonWebsocketConsumer):
                     cleaned_content,
                     room,
                 )
+            # Answer is incorrect
             else:
-                # Question reading ended, do penalty
+                # Received answer in grace time after question reading ended
+                # If answer is still, apply penalty.
                 if room.end_time - room.buzz_start_time >= GRACE_TIME:
                     p.score -= 10
                     p.negs += 1
@@ -319,26 +323,18 @@ class QuizbowlConsumer(JsonWebsocketConsumer):
                     room,
                 )
 
+                # Send lock out status to buzzing player
                 self.send_json({
                     "response_type": "lock_out",
                     "locked_out": True,
                 })
 
-            buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
-            room.state = 'playing'
-            room.start_time += buzz_duration
-            room.end_time += buzz_duration
-            room.save()
-
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'update_room',
-                    'data': get_response_json(room),
-                }
-            )
-
-        # Forfeit question if buzz time up
+                buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
+                room.state = 'playing'
+                room.start_time += buzz_duration
+                room.end_time += buzz_duration
+                room.save()
+        # Buzz time is up. Forfeit the question
         elif datetime.datetime.now().timestamp() >= room.buzz_start_time + GRACE_TIME:
             buzz_duration = datetime.datetime.now().timestamp() - room.buzz_start_time
             room.state = 'playing'
@@ -353,13 +349,13 @@ class QuizbowlConsumer(JsonWebsocketConsumer):
                 room,
             )
 
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'update_room',
-                    'data': get_response_json(room),
-                }
-            )
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'update_room',
+                'data': get_response_json(room),
+            }
+        )
 
     def get_answer(self, room):
         """Get answer for room question
