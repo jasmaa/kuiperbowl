@@ -6,39 +6,44 @@ Real-time multiplayer quizbowl
 
 ## Local Development
 
-Configure `web/.env.local` from `.env` with proper credentials.
+Install and run [PostgreSQL](https://www.postgresql.org/) and [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/) servers.
+
+Configure `.env` from `sample.env` with proper credentials.
 
 Set up a virtual environment if desired and run:
 
-```
-cd web
+```bash
+python -m venv venv
+source venv/bin/activate
 
-pip install -r "requirements.txt"
-python manage.py migrate
-python manage.py loaddata fixtures/default_rooms.json
-python manage.py loaddata fixtures/sample.json
+pip install uv
 
-# Start redist cache for channel layer
-# https://channels.readthedocs.io/en/stable/tutorial/part_2.html#enable-a-channel-layer
-docker run -p 6379:6379 -d redis:5
+uv run manage.py migrate
+uv run manage.py loaddata fixtures/default_rooms.json
+uv run manage.py loaddata fixtures/sample.json
 
-python manage.py runserver --insecure
+uv run manage.py runserver
 ```
 
-## Entering Tossup Data
+### Entering Tossup Data
 
-Tossup questions can be loaded easily from a fixture. Data can be downloaded
-from the [Protobowl DB dumps repo](https://github.com/neotenic/database-dumps)
-or custom made. See `fixtures/sample.json` for an example custom fixture.
+Tossup questions can be loaded from a fixture. Data can be downloaded from the [Protobowl DB dumps repo](https://github.com/neotenic/database-dumps) or custom made. See `fixtures/sample.json` for an example custom fixture.
 
-```
+```bash
 # Load fixture data from PB db dump
-cd web
-python scripts/pb_load.py
-python manage.py loaddata fixtures/pbdump.json
+uv run scripts/pb_load.py
+uv run manage.py loaddata fixtures/pbdump.json
 ```
 
-## Using Docker
+### Testing
+
+Run unit tests with:
+
+```bash
+uv run pytest
+```
+
+## Deploying with Docker
 
 ### Set Up and Run
 
@@ -46,13 +51,14 @@ Configure `.env` with proper credentials.
 
 Start application:
 
-```
-docker-compose up --build
+```bash
+docker build -t kuiperbowl:latest .
+docker run -p 127.0.0.1:8000:8000 kuiperbowl:latest
 ```
 
 ### Loading Data
 
-```
+```bash
 # Get container name of kuiperbowl_web
 docker ps
 

@@ -1,3 +1,0 @@
-# nginx
-
-Nginx reverse proxy

@@ -7,27 +7,27 @@ Deployment instructions for Ubuntu 20.04 on Digital Ocean.
 
 Install Postgresql:
 
-```
+```bash
 apt-get install postgresql postgresql-contrib libpq-dev
 ```
 
 Set up user with password:
 
-```
+```bash
 sudo -u postgres psql
 ALTER USER postgres PASSWORD '<INSERT DB PASS>';
 ```
 
 Create database:
 
-```
+```bash
 sudo -u postgres createdb <INSERT DB NAME>
 ```
 
 
 ## Set up Redis
 
-```
+```bash
 sudo apt install redis-server
 ```
 
@@ -36,7 +36,7 @@ sudo apt install redis-server
 
 Clone repo to `/opt` and enter repo root:
 
-```
+```bash
 cd /opt
 git clone https://github.com/jasmaa/kuiperbowl.git
 cd kuiperbowl
@@ -44,12 +44,13 @@ cd kuiperbowl
 
 Install Python dependencies:
 
-```
+```bash
 apt-get install python3-pip python-is-python3
-pip install -r "requirements.txt"
+
+pip install uv
 ```
 
-Create `web/.env.local` from `.env` and populate with credentials.
+Create `.env` from `sample.env` and populate with credentials.
 
 Bootstrap the database:
 
@@ -57,20 +58,20 @@ Bootstrap the database:
 can be fixed by running the script locally and transferring
 `fixtures/pbdump.json` to the server using SFTP.
 
-```
+```bash
 # Download and convert Protobowl question dumps
-python ./scripts/pb_load.py
+uv run ./scripts/pb_load.py
 
 # Bootstrap database
-python manage.py migrate
-python manage.py loaddata fixtures/default_rooms.json
-python manage.py loaddata fixtures/pbdump.json # This will take a while
+uv run manage.py migrate
+uv run manage.py loaddata fixtures/default_rooms.json
+uv run manage.py loaddata fixtures/pbdump.json # This will take a while
 ```
 
 Set up static assets:
 
-```
-python manage.py collectstatic --noinput --clear
+```bash
+uv run manage.py collectstatic --noinput --clear
 ```
 
 
@@ -82,7 +83,7 @@ and [Django's Nginx guide](https://uwsgi-docs.readthedocs.io/en/latest/tutorials
 
 Install Nginx:
 
-```
+```bash
 sudo apt install nginx
 ```
 
@@ -90,13 +91,13 @@ Copy `docs/kuiperbowl_nginx.conf` into `etc/nginx/sites-available`.
 
 Symlink to sites enabled:
 
-```
+```bash
 sudo ln -s /etc/nginx/sites-available/kuiperbowl_nginx.conf /etc/nginx/sites-enabled/
 ```
 
 Restart Nginx:
 
-```
+```bash
 sudo systemctl restart nginx
 ```
 
@@ -107,7 +108,7 @@ Copy `docs/kuiperbowl.service` into `/etc/systemd/system`.
 
 Reload systemd and start server with:
 
-```
+```bash
 systemctl daemon-reload
 systemctl enable kuiperbowl.service
 systemctl start kuiperbowl.service
@@ -129,13 +130,13 @@ Adapted from
 
 Install Certbot:
 
-```
+```bash
 sudo apt install certbot python3-certbot-nginx
 ```
 
 Get certificate:
 
-```
+```bash
 sudo certbot --nginx -d kuiperbowl.com -d www.kuiperbowl.com
 
 # Choose Redirect(2) when prompted
@@ -143,7 +144,7 @@ sudo certbot --nginx -d kuiperbowl.com -d www.kuiperbowl.com
 
 Enable auto-renewal:
 
-```
+```bash
 sudo systemctl status certbot.timer
 ```
 
@@ -152,12 +153,12 @@ sudo systemctl status certbot.timer
 
 Edit crontab with:
 
-```
+```bash
 crontab -e
 ```
 
 And add:
 
-```
+```bash
 0 0 * * * reboot
 ```
