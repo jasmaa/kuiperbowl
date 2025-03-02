@@ -185,16 +185,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "4.0.6"
+version = "4.2.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/17/b10aa26d7a566a3c19e9d29fac39c8643cbceb6cd7649a378d676839b5db/Django-4.0.6.tar.gz", hash = "sha256:a67a793ff6827fd373555537dca0da293a63a316fe34cb7f367f898ccca3c3ae", size = 10389543 }
+sdist = { url = "https://files.pythonhosted.org/packages/65/d8/a607ee443b54a4db4ad28902328b906ae6218aa556fb9b3ac45c0bcb313d/Django-4.2.16.tar.gz", hash = "sha256:6f1616c2786c408ce86ab7e10f792b8f15742f7b7b7460243929cb371e7f1dad", size = 10436023 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/97/e341b13d605a9d0732a37975ce6bfae643c296721b8644f42d5d720c99bf/Django-4.0.6-py3-none-any.whl", hash = "sha256:ca54ebedfcbc60d191391efbf02ba68fb52165b8bf6ccd6fe71f098cac1fe59e", size = 8041873 },
+    { url = "https://files.pythonhosted.org/packages/94/2c/6b6c7e493d5ea789416918658ebfa16be7a64c77610307497ed09a93c8c4/Django-4.2.16-py3-none-any.whl", hash = "sha256:1ddc333a16fc139fd253035a1606bb24261951bbc3a6ca256717fa06cc41a898", size = 7992936 },
 ]
 
 [[package]]
@@ -294,7 +294,7 @@ requires-dist = [
     { name = "channels", specifier = "==3.0.5" },
     { name = "channels-redis", specifier = "==3.4.1" },
     { name = "daphne", specifier = "==3.0.2" },
-    { name = "django", specifier = "==4.0.6" },
+    { name = "django", specifier = "==4.2.16" },
     { name = "fuzzywuzzy", specifier = ">=0.18.0" },
     { name = "legacy-cgi", specifier = ">=2.6.2" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
