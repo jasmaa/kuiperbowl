@@ -264,7 +264,7 @@ Response with answer to latest question in the room.
 }
 ```
 
-### LockOut
+#### LockOut
 
 Response indicating whether the user is locked out of the current question.
 
@@ -275,7 +275,7 @@ Response indicating whether the user is locked out of the current question.
 }
 ```
 
-### BuzzGrant
+#### BuzzGrant
 
 Response indicating that the user has claimed the room's current question.
 
