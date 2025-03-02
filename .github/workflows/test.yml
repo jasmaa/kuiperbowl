@@ -7,10 +7,30 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    env:
-      DEBUG: "True"
     name: Test
+    runs-on: ubuntu-latest
+    container: ubuntu:latest
+    env:
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_SERVICE: postgres
+      DB_PORT: 5432
+      REDIS_SERVICE: redis
+      REDIS_PORT: 6379
+      DEBUG: "True"
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v5
