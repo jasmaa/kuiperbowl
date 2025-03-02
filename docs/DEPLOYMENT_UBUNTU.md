@@ -2,7 +2,6 @@
 
 Deployment instructions for Ubuntu 20.04 on Digital Ocean.
 
-
 ## Set up Postgres
 
 Install Postgresql:
@@ -24,13 +23,11 @@ Create database:
 sudo -u postgres createdb kuiperbowl
 ```
 
-
 ## Set up Redis
 
 ```bash
 sudo apt install redis-server
 ```
-
 
 ## Set up web app
 
@@ -77,7 +74,6 @@ Set up static assets:
 ```bash
 uv run manage.py collectstatic --noinput --clear
 ```
-
 
 ## Set up Nginx
 
@@ -142,7 +138,6 @@ Add the following `A` records on DNS host:
 - Host: `@`, Value: <IP ADDRESS>
 - Host: `www`, Value: <IP ADDRESS>
 
-
 ## Set up Certbot
 
 Adapted from
@@ -168,7 +163,6 @@ Enable auto-renewal:
 sudo systemctl status certbot.timer
 ```
 
-
 ## Set up daily reboot
 
 Edit crontab with:
@@ -182,3 +176,30 @@ And add:
 ```bash
 0 0 * * * reboot
 ```
+
+## Deploying updates
+
+SSH into prod host and pull latest changes:
+
+```bash
+cd /opt/kuiperbowl
+git pull origin master
+```
+
+Make any updates to systemd or nginx if necessary:
+
+```bash
+cp docs/kuiperbowl.service /etc/systemd/system/kuiperbowl.service
+
+vi /etc/nginx/sites-available/kuiperbowl_nginx.conf
+# ...
+```
+
+Restart service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart kuiperbowl.service
+```
+
+Pray that nothing breaks.
