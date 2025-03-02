@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Load local env
-load_dotenv(os.path.join(BASE_DIR, '.env.local'))
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -78,9 +78,11 @@ ASGI_APPLICATION = 'quizbowl.routing.application'
 CHANNEL_LAYERS = {
     "default": {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG':{'hosts':[
-            (os.getenv('REDIS_SERVICE', 'localhost'), int(os.getenv('REDIS_PORT', '6379'))),
-        ]},
+        'CONFIG':{
+          'hosts': [
+                (os.getenv('REDIS_SERVICE', 'localhost'), int(os.getenv('REDIS_PORT', '6379'))),
+            ],
+        },
     },
 }
 
