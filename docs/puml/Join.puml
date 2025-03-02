@@ -1,0 +1,17 @@
+@startuml
+actor Alice
+actor Bob
+participant App
+
+Alice -> App: GET /game/testroom
+Alice -> App: Initiate ws connection on /ws/game/testroom
+App -> App: Get or create room
+Alice -> App: NewUser
+App -> App: Generate new Alice user
+Alice <- App: NewUser
+Alice -> App: Join
+App -> App: Create or get player for Alice user
+App -> App: Add Alice to testroom
+Alice <- App: Update
+Bob <- App: Update
+@enduml

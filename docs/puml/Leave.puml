@@ -1,0 +1,9 @@
+@startuml
+actor Alice
+actor Bob
+participant App
+
+Alice -> App: Leave
+Alice -> App: Disconnect ws connection
+Bob <- App: Update
+@enduml

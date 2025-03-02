@@ -1,0 +1,13 @@
+@startuml
+actor Alice
+actor Bob
+participant App
+
+Alice -> App: Ping
+App -> App: Look up room state
+App -> App: Update Alice last seen to now
+App -> App: Update room time to now
+Alice <- App: Update
+Alice <- App: LockOut status
+Bob <- App: Update
+@enduml

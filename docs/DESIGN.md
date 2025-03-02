@@ -6,7 +6,28 @@ Kuiperbowl is a real-time multiplayer quizbowl application. It allows users to p
 
 ## Architecture
 
-TODO
+![Kuiperbowl architecture diagram](./drawio/Kuiperbowl.drawio.png)
+
+
+### Join
+
+![Join data flow](./puml/Join.puml.png)
+
+### Leave
+
+![Leave data flow](./puml/Leave.puml.png)
+
+### Ping
+
+![Ping data flow](./puml/Ping.puml.png)
+
+### Buzz and answer
+
+![Buzz and answer data flow](./puml/BuzzAndAnswer.puml.png)
+
+### Change name
+
+![Change name data flow](./puml/ChangeName.puml.png)
 
 ## Wire protocol
 
@@ -254,9 +275,19 @@ Response indicating whether the user is locked out of the current question.
 }
 ```
 
+### BuzzGrant
+
+Response indicating that the user has claimed the room's current question.
+
+```
+{
+  "response_type": "buzz_grant"
+}
+```
+
 #### Kick
 
-Response indicating the user has been banned from the room.
+Response indicating that the user has been banned from the room.
 
 ```
 {

@@ -1,0 +1,11 @@
+@startuml
+actor Alice
+actor Bob
+participant App
+
+Alice -> App: SetName
+App -> App: Look up room state
+App -> App: Update Alice player with new user name
+Alice <- App: Update
+Bob <- App: Update
+@enduml

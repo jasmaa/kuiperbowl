@@ -1,0 +1,45 @@
+@startuml
+actor Alice
+actor Bob
+participant App
+
+Alice -> App: BuzzInit
+
+alt room state is playing and question exists
+  App -> App: Set room state to contest
+  App -> App: Set current buzzing player to Alice
+  App -> App: Set current buzz time to now
+  App -> App: Lock Alice out of answering current question again
+  Alice <- App: BuzzGrant
+  Alice <- App: Update
+  Bob <- App: Update
+
+  alt Bob attempts to buzz
+    Bob -> App: BuzzInit
+    App -> App: Room is in contest state. Bob's BuzzInit is dropped.
+  end
+
+  Alice -> App: BuzzAnswer
+  alt answer is correct
+    App -> App: Update Alice player with points
+    App -> App: Update room time to end question
+    Alice <- Bob: BuzzCorrect
+  else answer is incorrect
+    App -> App: Update Alice player with penalty
+    App -> App: Update room time to erase time spent by Alice answering question
+    App -> App: Set room state to playing
+    Alice <- App: LockOut status
+  end
+
+  Alice <- App: Update
+  Bob <- App: Update
+
+  Bob -> App: Next
+  App -> App: Update room state
+  alt room is idle
+    App -> App: Select a random question
+    App -> App: Unlock all players
+    App -> App: Set room state to playing
+  end
+end
+@enduml
