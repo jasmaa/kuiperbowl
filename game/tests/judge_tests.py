@@ -19,11 +19,15 @@ def test_judge_answer_when_fuzzy_match():
 
 def test_judge_answer_when_single_bracket_match():
     assert (
-        judge_answer("mitochondria", "Accept {mitochondria} [do not accept golgi body]")
+        judge_answer(
+            "mitochondria", "Accept {mitochondria} [do not accept golgi body]"
+        )
         is True
     )
     assert (
-        judge_answer("golgi body", "Accept {mitochondria} [do not accept golgi body]")
+        judge_answer(
+            "golgi body", "Accept {mitochondria} [do not accept golgi body]"
+        )
         is False
     )
 
@@ -31,7 +35,8 @@ def test_judge_answer_when_single_bracket_match():
 def test_judge_answer_when_multi_bracket_match():
     assert (
         judge_answer(
-            "mitochondria", "Accept {mitochondria} or {the powerhouse of the cell}"
+            "mitochondria",
+            "Accept {mitochondria} or {the powerhouse of the cell}",
         )
         is True
     )

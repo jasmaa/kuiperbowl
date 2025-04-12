@@ -21,47 +21,47 @@ class Question(models.Model):
 class Room(models.Model):
     """Room to play quizbowl"""
 
-    IDLE = 'idle'
-    PLAYING = 'playing'
-    CONTEST = 'contest'
+    IDLE = "idle"
+    PLAYING = "playing"
+    CONTEST = "contest"
     game_states = (
-        (IDLE, 'idle'),
-        (PLAYING, 'playing'),
-        (CONTEST, 'contest'),
+        (IDLE, "idle"),
+        (PLAYING, "playing"),
+        (CONTEST, "contest"),
     )
 
-    EVERYTHING = 'Everything'
-    SCIENCE = 'Science'
-    HISTORY = 'History'
-    LITERATURE = 'Literature'
-    PHILOSOPHY = 'Philosophy'
-    RELIGION = 'Religion'
-    GEOGRAPHY = 'Geography'
-    FINE_ARTS = 'Fine Arts'
-    SOCIAL_SCIENCE = 'Social Science'
-    MYTHOLOGY = 'Mythology'
-    TRASH = 'Trash'
+    EVERYTHING = "Everything"
+    SCIENCE = "Science"
+    HISTORY = "History"
+    LITERATURE = "Literature"
+    PHILOSOPHY = "Philosophy"
+    RELIGION = "Religion"
+    GEOGRAPHY = "Geography"
+    FINE_ARTS = "Fine Arts"
+    SOCIAL_SCIENCE = "Social Science"
+    MYTHOLOGY = "Mythology"
+    TRASH = "Trash"
     categories = (
-        (EVERYTHING, 'Everything'),
-        (SCIENCE, 'Science'),
-        (HISTORY, 'History'),
-        (LITERATURE, 'Literature'),
-        (PHILOSOPHY, 'Philosophy'),
-        (RELIGION, 'Religion'),
-        (GEOGRAPHY, 'Geography'),
-        (FINE_ARTS, 'Fine Arts'),
-        (SOCIAL_SCIENCE, 'Social Science'),
-        (MYTHOLOGY, 'Mythology'),
-        (TRASH, 'Trash'),
+        (EVERYTHING, "Everything"),
+        (SCIENCE, "Science"),
+        (HISTORY, "History"),
+        (LITERATURE, "Literature"),
+        (PHILOSOPHY, "Philosophy"),
+        (RELIGION, "Religion"),
+        (GEOGRAPHY, "Geography"),
+        (FINE_ARTS, "Fine Arts"),
+        (SOCIAL_SCIENCE, "Social Science"),
+        (MYTHOLOGY, "Mythology"),
+        (TRASH, "Trash"),
     )
 
     COLLEGE = "College"
     HS = "HS"
     MS = "MS"
     difficulties = (
-        (COLLEGE, 'College'),
-        (MS, 'MS'),
-        (HS, 'HS'),
+        (COLLEGE, "College"),
+        (MS, "MS"),
+        (HS, "HS"),
     )
 
     label = models.SlugField(unique=True)
@@ -70,7 +70,7 @@ class Room(models.Model):
     current_question = models.ForeignKey(
         Question,
         on_delete=models.SET_NULL,
-        related_name='rooms',
+        related_name="rooms",
         null=True,
         blank=True,
     )
@@ -78,11 +78,11 @@ class Room(models.Model):
     end_time = models.FloatField(default=1)
 
     buzz_player = models.OneToOneField(
-        'Player',
+        "Player",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='buzz_player',
+        related_name="buzz_player",
     )
     buzz_start_time = models.FloatField(default=0)
     buzz_end_time = models.FloatField(default=1)
@@ -97,7 +97,9 @@ class Room(models.Model):
         choices=difficulties,
         default=HS,
     )
-    change_locked = models.BooleanField(default=False) # Category and difficulty changes locked
+    change_locked = models.BooleanField(
+        default=False
+    )  # Category and difficulty changes locked
 
     def __str__(self):
         return self.label
@@ -105,33 +107,41 @@ class Room(models.Model):
     def get_players(self):
 
         valid_players = self.players.filter(
-            Q(last_seen__gte=datetime.datetime.now().timestamp() - 3600) &
-            Q(banned=False)
+            Q(last_seen__gte=datetime.datetime.now().timestamp() - 3600)
+            & Q(banned=False)
         )
 
-        player_list = [{
-            'user_name': player.user.name,
-            'player_id': player.player_id,
-            'score': player.score,
-            'correct': player.correct,
-            'negs': player.negs,
-            'last_seen': player.last_seen,
-            'active': datetime.datetime.now().timestamp() - player.last_seen < 10,
-        } for player in valid_players]
+        player_list = [
+            {
+                "user_name": player.user.name,
+                "player_id": player.player_id,
+                "score": player.score,
+                "correct": player.correct,
+                "negs": player.negs,
+                "last_seen": player.last_seen,
+                "active": datetime.datetime.now().timestamp()
+                - player.last_seen
+                < 10,
+            }
+            for player in valid_players
+        ]
 
-        player_list.sort(key=lambda player: player['score'])
+        player_list.sort(key=lambda player: player["score"])
         return player_list
 
     def get_messages(self):
 
         valid_messages = self.messages.filter(visible=True)
 
-        chrono_messages = [{
-            'message_id': m.message_id,
-            'tag': m.tag,
-            'user_name': m.player.user.name,
-            'content': m.content
-        } for m in valid_messages.order_by('timestamp').reverse()[:50]]
+        chrono_messages = [
+            {
+                "message_id": m.message_id,
+                "tag": m.tag,
+                "user_name": m.player.user.name,
+                "content": m.content,
+            }
+            for m in valid_messages.order_by("timestamp").reverse()[:50]
+        ]
 
         return chrono_messages
 
@@ -153,24 +163,23 @@ class Player(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='players',
+        related_name="players",
     )
     room = models.ForeignKey(
         Room,
         on_delete=models.CASCADE,
-        related_name='players',
+        related_name="players",
     )
     score = models.IntegerField(default=0)
     correct = models.IntegerField(default=0)
     negs = models.IntegerField(default=0)
     locked_out = models.BooleanField(default=False)
     banned = models.BooleanField(default=False)
-    reported_by = models.ManyToManyField('Player')
+    reported_by = models.ManyToManyField("Player")
     last_seen = models.FloatField(default=0)
 
     def unban(self):
-        """Unban player
-        """
+        """Unban player"""
         self.banned = False
         self.reported_by.clear()
         self.save()
@@ -182,39 +191,39 @@ class Player(models.Model):
 class Message(models.Model):
     """Message that can be sent by Players"""
 
-    JOIN = 'join'
-    LEAVE = 'leave'
-    BUZZ_INIT = 'buzz_init'
-    BUZZ_CORRECT = 'buzz_correct'
-    BUZZ_WRONG = 'buzz_wrong'
-    BUZZ_FORFEIT = 'buzz_forfeit'
-    SET_CATEGORY = 'set_category'
-    SET_DIFFICULTY = 'set_difficulty'
-    RESET_SCORE = 'reset_score'
-    CHAT = 'chat'
+    JOIN = "join"
+    LEAVE = "leave"
+    BUZZ_INIT = "buzz_init"
+    BUZZ_CORRECT = "buzz_correct"
+    BUZZ_WRONG = "buzz_wrong"
+    BUZZ_FORFEIT = "buzz_forfeit"
+    SET_CATEGORY = "set_category"
+    SET_DIFFICULTY = "set_difficulty"
+    RESET_SCORE = "reset_score"
+    CHAT = "chat"
     message_tags = (
-        (JOIN, 'join'),
-        (LEAVE, 'leave'),
-        (BUZZ_INIT, 'buzz_init'),
-        (BUZZ_CORRECT, 'buzz_correct'),
-        (BUZZ_WRONG, 'buzz_wrong'),
-        (BUZZ_FORFEIT, 'buzz_forfeit'),
-        (SET_CATEGORY, 'set_category'),
-        (SET_DIFFICULTY, 'set_difficulty'),
-        (RESET_SCORE, 'reset_score'),
-        (CHAT, 'chat'),
+        (JOIN, "join"),
+        (LEAVE, "leave"),
+        (BUZZ_INIT, "buzz_init"),
+        (BUZZ_CORRECT, "buzz_correct"),
+        (BUZZ_WRONG, "buzz_wrong"),
+        (BUZZ_FORFEIT, "buzz_forfeit"),
+        (SET_CATEGORY, "set_category"),
+        (SET_DIFFICULTY, "set_difficulty"),
+        (RESET_SCORE, "reset_score"),
+        (CHAT, "chat"),
     )
 
     message_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(
         Room,
         on_delete=models.CASCADE,
-        related_name='messages',
+        related_name="messages",
     )
     player = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
-        related_name='messages',
+        related_name="messages",
     )
     content = models.CharField(max_length=200, null=True, blank=True)
     tag = models.CharField(max_length=20, choices=message_tags)

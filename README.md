@@ -51,6 +51,14 @@ Run unit tests with:
 uv run pytest
 ```
 
+### Format
+
+Format code with black:
+
+```bash
+uv run black .
+```
+
 ## Deploying with Docker
 
 ### Set Up and Run
