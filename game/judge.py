@@ -17,10 +17,11 @@ def judge_answer(user_answer, question_answer):
     if len(major_answers) <= 0:
         major_answers = [question_answer]
     
-    r = 0.8*compare_answer_tokens(user_answer, major_answers) + \
-        0.2*compare_answer_partial(user_answer, major_answers)
+    exact_answer_weight = 0.7
+    score = exact_answer_weight*compare_answer_tokens(user_answer, major_answers) + \
+        (1-exact_answer_weight)*compare_answer_partial(user_answer, major_answers)
 
-    return r >= 0.7
+    return score >= 0.7
 
 
 def compare_answer_tokens(user_answer, major_answers):
