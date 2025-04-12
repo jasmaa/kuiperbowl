@@ -2,7 +2,8 @@ import pytest
 
 from ..models import *
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
 
@@ -19,17 +20,14 @@ def django_db_setup(django_db_setup, django_db_blocker):
 
         # === Rooms ===
         testroom = Room.objects.create(
-            label='testroom',
+            label="testroom",
         )
         testroom2 = Room.objects.create(
-            label='testroom2',
+            label="testroom2",
         )
 
         # === Users ===
-        user_chad = User.objects.create(
-            user_id="1",
-            name="chad"
-        )
+        user_chad = User.objects.create(user_id="1", name="chad")
         user_vivian = User.objects.create(
             user_id="2",
             name="vivian",

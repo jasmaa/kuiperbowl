@@ -27,19 +27,16 @@ NOUNS = [
 
 
 def clean_content(content):
-    """Escapes HTML
-    """
+    """Escapes HTML"""
     return html.escape(content)
 
 
 def generate_name():
-    """Generates randomized name
-    """
-    return '-'.join([random.choice(PREFIX), random.choice(NOUNS)])
+    """Generates randomized name"""
+    return "-".join([random.choice(PREFIX), random.choice(NOUNS)])
 
 
 def generate_id():
-    """Generate user id
-    """
+    """Generate user id"""
     # TODO: account for collision??
     return uuid.uuid4().hex
