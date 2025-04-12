@@ -40,4 +40,5 @@ jobs:
       - run: uv run manage.py migrate
       - run: uv run manage.py loaddata fixtures/default_rooms.json
       - run: uv run manage.py loaddata fixtures/sample.json
+      - run: uv run black --check .
       - run: uv run pytest
