@@ -308,7 +308,6 @@ name = "kuiperbowl"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "black" },
     { name = "channels" },
     { name = "channels-redis" },
     { name = "daphne" },
@@ -316,16 +315,20 @@ dependencies = [
     { name = "fuzzywuzzy" },
     { name = "legacy-cgi" },
     { name = "psycopg2-binary" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-django" },
     { name = "python-dotenv" },
     { name = "python-levenshtein" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-django" },
+]
+
 [package.metadata]
 requires-dist = [
-    { name = "black", specifier = ">=25.1.0" },
     { name = "channels", specifier = "==3.0.5" },
     { name = "channels-redis", specifier = "==3.4.1" },
     { name = "daphne", specifier = "==3.0.2" },
@@ -333,11 +336,16 @@ requires-dist = [
     { name = "fuzzywuzzy", specifier = ">=0.18.0" },
     { name = "legacy-cgi", specifier = ">=2.6.2" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "python-levenshtein", specifier = ">=0.26.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=25.1.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
     { name = "pytest-django", specifier = ">=4.10.0" },
-    { name = "python-dotenv", specifier = ">=1.0.1" },
-    { name = "python-levenshtein", specifier = ">=0.26.1" },
 ]
 
 [[package]]
