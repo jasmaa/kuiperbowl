@@ -202,4 +202,14 @@ sudo systemctl daemon-reload
 sudo systemctl restart kuiperbowl.service
 ```
 
+Check status of service with:
+
+```bash
+sudo systemctl status kuiperbowl.service
+
+# or
+
+sudo journalctl -u kuiperbowl.service | tail
+```
+
 Pray that nothing breaks.
